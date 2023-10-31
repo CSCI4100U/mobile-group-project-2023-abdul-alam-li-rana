@@ -1,3 +1,4 @@
+import 'package:final_project/vehicle_formpage.dart';
 import 'package:flutter/material.dart';
 import 'sidebar.dart';
 
@@ -28,6 +29,15 @@ class VehicleHomePage extends StatelessWidget {
         ),
       ),
       drawer: SideMenu(), // Add the SideMenu to the Drawer
+            floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          //_addGrade(context); 
+          Navigator.of(context).push(MaterialPageRoute(builder: (context) => VehicleFormPage()));
+        },
+        tooltip: 'Add Grade',
+        foregroundColor: Colors.white,
+        child: Icon(Icons.add),
+      ),
     );
   }
 }
