@@ -86,9 +86,10 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
                 );
 
                 if (updatedVehicle != null) {
-                  setState(() {
-                    fetchVehicles();
-                  });
+                fetchVehicles();
+                setState(() {
+                  selectedVehicle = noSelection;
+                });
                 }
               }
             },

@@ -20,6 +20,7 @@ class _EditVehicleState extends State<EditVehicle> {
   final TextEditingController yearController;
   final TextEditingController colorController;
   final TextEditingController vinController;
+  String errorMessage = '';
 
   _EditVehicleState({required this.vehicleToEdit})
       : makeController = TextEditingController(text: vehicleToEdit.make),
@@ -45,25 +46,37 @@ class _EditVehicleState extends State<EditVehicle> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: <Widget>[
-            TextField(
+               TextField(
               controller: makeController,
-              decoration: InputDecoration(labelText: 'Make'),
+              decoration: InputDecoration(
+                labelText: 'Make*',
+              ),
             ),
             TextField(
               controller: modelController,
-              decoration: InputDecoration(labelText: 'Model'),
+              decoration: InputDecoration(
+                labelText: 'Model*',
+              ),
             ),
-             TextField(
+            TextField(
               controller: yearController,
-              decoration: InputDecoration(labelText: 'Year'),
+              decoration: InputDecoration(
+                labelText: 'Year*',
+              ),
             ),
             TextField(
               controller: colorController,
               decoration: InputDecoration(labelText: 'Color'),
-            ), TextField(
+            ),
+            TextField(
               controller: vinController,
               decoration: InputDecoration(labelText: 'VIN'),
             ),
+            if (errorMessage.isNotEmpty)
+              Text(
+                errorMessage,
+                style: TextStyle(color: Colors.red),
+              ),
           ],
         ),
       ),
@@ -75,7 +88,11 @@ class _EditVehicleState extends State<EditVehicle> {
           String color = colorController.text;
           String vin = vinController.text;
 
-          
+            
+            
+
+
+          if (make.isNotEmpty && model.isNotEmpty && year.isNotEmpty) {
             Vehicle updatedVehicle = Vehicle(
             id: vehicleToEdit.id,
             make: make,
@@ -84,10 +101,14 @@ class _EditVehicleState extends State<EditVehicle> {
             color: color,
             vin: vin,
             );
-          print("do we go here?");
-          updateVehicle(updatedVehicle);
+            updateVehicle(updatedVehicle);
+            Navigator.pop(context, updatedVehicle);
+          } else {
+            setState(() {
+              errorMessage = 'Please fill in the required fields.';
+            });
+          }
 
-          Navigator.pop(context,updatedVehicle);
         },
         backgroundColor: Colors.blue,
 
