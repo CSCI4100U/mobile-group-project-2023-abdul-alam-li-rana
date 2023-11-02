@@ -1,3 +1,4 @@
+import 'package:final_project/vehicle_formpage.dart';
 import 'package:flutter/material.dart';
 import 'sidebar.dart';
 import 'vehicle.dart';
@@ -138,7 +139,8 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
         backgroundColor: Colors.blue,
         child: Icon(Icons.add),
       ),
-      drawer: SideMenu(),
+      drawer: SideMenu(), // Add the SideMenu to the Drawer
+       
     );
   }
 }
