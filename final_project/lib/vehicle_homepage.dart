@@ -140,7 +140,6 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
         child: Icon(Icons.add),
       ),
       drawer: SideMenu(), // Add the SideMenu to the Drawer
-       
     );
   }
 }
