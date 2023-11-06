@@ -4,7 +4,7 @@ import 'vehicle.dart';
 
 class VehiclesModel{
 
-    Future<int> insertVehicle(Vehicles vehicle) async{
+    Future<int> insertVehicle(Vehicle vehicle) async{
     //This needs to be present in any queries, updates, etc.
     //you do with your database
     final db = await DBUtils.init();
@@ -23,13 +23,13 @@ class VehiclesModel{
     List result = [];
     for (int i = 0; i < maps.length; i++){
       result.add(
-        Vehicles.fromMap(maps[i])
+        Vehicle.fromMap(maps[i])
       );
     }
     return result;
   }
 
-    Future<int> updateVehicle(Vehicles vehicle) async{
+    Future<int> updateVehicle(Vehicle vehicle) async{
     //This needs to be present in any queries, updates, etc.
     //you do with your database
     final db = await DBUtils.init();
