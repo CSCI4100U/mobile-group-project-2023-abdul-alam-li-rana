@@ -1,15 +1,15 @@
-import 'package:sqflite/sqflite.dart';
 import 'dart:async';
+import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as path;
 
-class DBUtils{
+class DBUtils {
   static Future init() async{
     //set up the database
     var database = openDatabase(
-      path.join(await getDatabasesPath(), 'vehicles.db'),
+      path.join(await getDatabasesPath(), 'accountv3.db'),
       onCreate: (db, version){
         db.execute(
-            'CREATE TABLE vehicles(vin TEXT PRIMARY KEY, make TEXT, model TEXT, year INTEGER, type TEXT)'
+            'CREATE TABLE accounts(email TEXT PRIMARY KEY, profilePicture BLOB)'
         );
       },
       version: 1,
