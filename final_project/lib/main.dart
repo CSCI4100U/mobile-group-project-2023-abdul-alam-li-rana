@@ -8,6 +8,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'home_page.dart';
 import 'login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'verification_screen.dart';
 
 void main() async {
 
@@ -23,25 +24,43 @@ void main() async {
 
   // Initialize Firebase with the constructed options
   await Firebase.initializeApp(options: options);
+  FirebaseAuth auth = FirebaseAuth.instance;
+
   runApp(MyApp());
 }
 
+
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        home: StreamBuilder(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return HomePage();
+  return MaterialApp(
+  home: StreamBuilder(
+    stream: FirebaseAuth.instance.authStateChanges(),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.active) {
+        final user = snapshot.data as User?;
+        if (user != null) {
+          if (user.emailVerified) {
+            return HomePage();
+          } else {
+            // Check if the user signed out, and show the login form accordingly.
+            return EmailVerificationScreen();
+            print("after sign out?");
+          }
         } else {
           return LoginForm();
         }
-      },
-    ));
-  }
+      }
+      return CircularProgressIndicator();
+    },
+  ),
+);
 }
+}
+
+
+
+
 

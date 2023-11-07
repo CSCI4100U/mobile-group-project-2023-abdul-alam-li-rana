@@ -5,6 +5,8 @@ import 'package:path/path.dart';
 import 'vehicle.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'dart:math';
+
 
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -61,4 +63,13 @@ Future<void> deleteVehicle(String id) async {
       }
     });
   }
+}
+
+
+
+
+String generateVerificationCode() {
+  // Generate a random 6-digit verification code
+  final random = Random();
+  return (100000 + random.nextInt(900000)).toString();
 }
