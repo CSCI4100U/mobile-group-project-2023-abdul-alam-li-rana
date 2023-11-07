@@ -11,6 +11,7 @@ import 'help_page.dart';
 import 'service_page.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'login.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -18,6 +19,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  bool snackbarFlag = false;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final ImagePicker _picker = ImagePicker();
   File? _profilepic;
@@ -26,7 +28,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-
+    FirebaseAuth.instance.currentUser?.reload();
     // Call _readAccounts when the widget initializes (once)
     _readAccounts();
   }
@@ -38,6 +40,13 @@ class _HomePageState extends State<HomePage> {
       fontSize: 30.0,
       fontWeight: FontWeight.bold,
     );
+
+    if (snackbarFlag == false){
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('You are Logged in')));
+        snackbarFlag = true;
+      });
+    }
 
     return Scaffold(
       key: _scaffoldKey,
@@ -120,10 +129,11 @@ class _HomePageState extends State<HomePage> {
 
   void _readAccounts() async {
     final allAccounts = await AccountModel().getAllAccounts();
-    setState(() {
-      accounts = allAccounts.cast<Account>();
-    });
-
+    if (mounted){
+      setState(() {
+        accounts = allAccounts.cast<Account>();
+      });
+    }
     User? user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
@@ -152,6 +162,7 @@ class _HomePageState extends State<HomePage> {
   User? user = FirebaseAuth.instance.currentUser;
   String? fullName = user?.displayName;
   String? email = user?.email;
+  
 
   return FutureBuilder(
     future: _getProfilePicture(),

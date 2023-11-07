@@ -25,6 +25,9 @@ void main() async {
   // Initialize Firebase with the constructed options
   await Firebase.initializeApp(options: options);
   FirebaseAuth auth = FirebaseAuth.instance;
+  User? user = FirebaseAuth.instance.currentUser;
+  await user?.reload();
+  user = auth.currentUser;
 
   runApp(MyApp());
 }
