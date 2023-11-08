@@ -38,7 +38,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Email Successfully Verified")));
       Navigator.pop(context);
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage()));
+      
     }
   }
 
