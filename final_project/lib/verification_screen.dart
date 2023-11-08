@@ -19,8 +19,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
 
   @override
   void initState() {
-    super.initState();
-    checkEmailVerified(); // Check email verification immediately when the screen loads.
+    checkEmailVerified(); 
     if (emailSent == false){
       FirebaseAuth.instance.currentUser?.sendEmailVerification();
       emailSent = true;
@@ -37,8 +36,11 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     if (isEmailVerified) {
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Email Successfully Verified")));
-      Navigator.pop(context);
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage()));
+         Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => MyApp()),
+        (route) => false);
+        
     }
   }
 
@@ -48,6 +50,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
+            automaticallyImplyLeading: false, // This line prevents the back button
           actions: [
             IconButton(
               onPressed: () async {

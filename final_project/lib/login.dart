@@ -110,7 +110,7 @@ class _LoginFormState extends State<LoginForm> {
                       _formKey.currentState!.save();
                       final result = login
                       ? await AuthServices.signinUser(email, password, context)
-                       : (await signUp(userEmail: email, password: password, context: context)) != null
+                      : (await signUp(userEmail: email, password: password, username: fullname, context: context)) != null
                         ? Navigator.push(context, MaterialPageRoute(builder: (ctx) => const EmailVerificationScreen()))
                         : null;
                       
@@ -152,23 +152,29 @@ class _LoginFormState extends State<LoginForm> {
   }
 }
 
-Future<User?> signUp(
-      {required String userEmail,
-        required String password,
-        required BuildContext context}) async {
-    try {
-      UserCredential userCredential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: userEmail, password: password);
-      return userCredential.user;
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('The password provided is too weak.')));
-      } else if (e.code == 'email-already-in-use') {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('The account already exists for that email.')));
-      }
-      return null;
-    } catch (e) {
-      debugPrint(e.toString());
-      return null;
+Future<User?> signUp({
+  required String userEmail,
+  required String password,
+  required String username, // Add username parameter
+  required BuildContext context,
+}) async {
+  try {
+    UserCredential userCredential = await FirebaseAuth.instance
+        .createUserWithEmailAndPassword(email: userEmail, password: password);
+
+    // Update user's profile with the username
+    await userCredential.user?.updateProfile(displayName: username);
+
+    return userCredential.user;
+  } on FirebaseAuthException catch (e) {
+    if (e.code == 'weak-password') {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('The password provided is too weak.')));
+    } else if (e.code == 'email-already-in-use') {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('The account already exists for that email.')));
     }
+    return null;
+  } catch (e) {
+    debugPrint(e.toString());
+    return null;
   }
+}
