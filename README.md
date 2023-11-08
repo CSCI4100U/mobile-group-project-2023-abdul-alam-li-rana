@@ -9,7 +9,7 @@ Group members (3-5) (no Student IDs, only names and github usernames):
 
 3. Taha Rana
 
-4. Almas Alam
+4. Rhythm Alam
 
 
 ## Overview
