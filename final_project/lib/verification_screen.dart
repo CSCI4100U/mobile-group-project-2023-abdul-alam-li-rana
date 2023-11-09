@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'package:final_project/dbops.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'main.dart';
 import 'login.dart';
 import 'home_page.dart';
@@ -15,15 +17,25 @@ class EmailVerificationScreen extends StatefulWidget {
 
 class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   bool isEmailVerified = false;
-  bool emailSent = false;
+  //final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
   @override
   void initState() {
+    super.initState();
+
+    /* Initialize notifications
+    final AndroidInitializationSettings initializationSettingsAndroid =
+    AndroidInitializationSettings('app_icon');
+    final InitializationSettings initializationSettings =
+    InitializationSettings(
+      android: initializationSettingsAndroid,
+    );
+    flutterLocalNotificationsPlugin.initialize(initializationSettings);
+    */
     checkEmailVerified(); 
-    if (emailSent == false){
-      FirebaseAuth.instance.currentUser?.sendEmailVerification();
-      emailSent = true;
-    }
+    FirebaseAuth.instance.currentUser?.sendEmailVerification();
+    
+    
   }
 
   checkEmailVerified() async {
@@ -41,7 +53,22 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
         MaterialPageRoute(builder: (context) => MyApp()),
         (route) => false);
         
-    }
+    }/*else{
+      await flutterLocalNotificationsPlugin.show(
+        0,
+        'Email Not Verified!',
+        'You have not verified your email yet. Please check your ${auth.currentUser?.email} inbox!',
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            'your_channel_id',
+            'your_channel_name',
+            channelDescription: 'your_channel_description',
+            importance: Importance.max,
+            priority: Priority.high,
+          ),
+        ),
+      );
+    }*/
   }
 
   @override
