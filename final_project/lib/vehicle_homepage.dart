@@ -119,7 +119,6 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
                     vehicle: vehicle,
                     onVehicleUpdated: (updatedVehicle) {
                       fetchVehicles(); // Call the fetchVehicles callback
-                      // You can add additional logic here if needed
                     },
                   ),
                 ),
