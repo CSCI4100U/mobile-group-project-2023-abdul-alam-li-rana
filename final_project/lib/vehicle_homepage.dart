@@ -1,10 +1,10 @@
-import 'package:final_project/vehicle_formpage.dart';
 import 'package:flutter/material.dart';
 import 'sidebar.dart';
 import 'vehicle.dart';
 import 'dbops.dart';
 import 'add_vehicle.dart';
 import 'edit_vehicle.dart';
+import 'vehicle_details_page.dart';
 
 class VehicleHomePage extends StatefulWidget {
   @override
@@ -99,29 +99,35 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
       body: (vehicles.isEmpty
           ? Center(child: Text('No data'))
           : ListView.builder(
-              itemCount: vehicles.length,
-              itemBuilder: (context, index) {
-                final vehicle = vehicles[index];
-                return ListTile(
-                  title: Text(
-                    '${vehicle.make} ${vehicle.model} (${vehicle.year})',
-                    style: TextStyle(
-                      fontSize: 22,
-                      color:
-                          (selectedVehicle == vehicle) ? Colors.lightGreen : Colors.black,
-                    ),
+        itemCount: vehicles.length,
+        itemBuilder: (context, index) {
+          final vehicle = vehicles[index];
+          return ListTile(
+            title: Text(
+              '${vehicle.make} ${vehicle.model} (${vehicle.year})',
+              style: TextStyle(
+                fontSize: 22,
+                color: (selectedVehicle == vehicle) ? Colors.lightGreen : Colors.black,
+              ),
+            ),
+            tileColor: (selectedVehicle.id == vehicle.id) ? Colors.lightBlue : null,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => VehicleDetailsPage(
+                    vehicle: vehicle,
+                    onVehicleUpdated: (updatedVehicle) {
+                      fetchVehicles(); // Call the fetchVehicles callback
+                      // You can add additional logic here if needed
+                    },
                   ),
-                  tileColor:
-                      (selectedVehicle.id == vehicle.id) ? Colors.lightBlue : null,
-                  onTap: () {
-                    setState(() {
-                      print("Vehicle is selected");
-                      selectedVehicle = vehicle;
-                    });
-                  },
-                );
-              },
-            )),
+                ),
+              );
+            },
+          );
+        },
+      )),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           final addedVehicle = await Navigator.push(
