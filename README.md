@@ -1,74 +1,121 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c5622901739e7c5dd533143b0c8e959d652212380cedb1ea36.svg)](https://classroom.github.com/a/Ejc5gqh5)
 # CSCI4100 Group Project
 
-Group members (3-5) (no Student IDs, only names and github usernames):
+[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c5622901739e7c5dd533143b0c8e959d652212380cedb1ea36.svg)](https://classroom.github.com/a/Ejc5gqh5)
 
-1. Justin Li (Ju5t1nLi)
+## Group Members (3-5) (No Student IDs, Only Names and GitHub Usernames):
 
+1. Justin Li ([Ju5t1nLi](https://github.com/Ju5t1nLi))
 2. Ahad Abdul
-
 3. Taha Rana
-
 4. Rhythm Alam
 
 ## Mid Course Check-in User Guide
+
 ### Step 1: Initialization
-  - Ensure you have run 'flutter pub get' to get all dependencies for the prototype
-  - Ensure you accept all permission requests once in the app or else some features may be disabled
-    
-Using an emulator:
-  - Launch device emulator
-  - Run the application
-    
-Using a physical device (Android only):
-  - Deploy app to physical device
-  - Open the app
-    
+
+- Ensure you have run `flutter pub get` to get all dependencies for the prototype.
+- Ensure you accept all permission requests once in the app or else some features may be disabled.
+
+#### Using an Emulator:
+
+- Launch device emulator.
+- Run the application.
+
+#### Using a Physical Device (Android Only):
+
+- Deploy the app to a physical device.
+- Open the app.
+
 ### Step 2: Login Page
-  - Once you open the app, you will be greeted with a login page.
-     - Type your full name, a valid email address, and password to sign up for an account.
-     - Once entered, press the 'sign up' button.
-       - _Alternatively, you can press the 'login' button if you already have an existing account created._
-  - You will be sent to an email verification screen. Please check your given email address for a verification email to verify your account.
-     - A group member encountered a bug in their emulator where the app would crash when heading to the email verification page (others did not have any issues). The email will still send, however. If this occurs, please close the app and re-run the app. It should bring you back to the verification screen with no issues. If the screen still freezes, verify your email, then run the app again. You will be sent to the homepage.
-  - Once verified, press the 'check verification' button to authenticate into the app.
-     - If needed, you can press the 'resend' button to send another email _**Note:** Whenever you enter the verification screen, you will be sent another verification email to authenticate._
-       
+
+- Once you open the app, you will be greeted with a login page.
+  - Type your full name, a valid email address, and password to sign up for an account.
+    
+  <img src="readme_images/signup.png" alt="Signup" width="250">
+  
+  - Once entered, press the 'Sign Up' button.
+  - Alternatively, you can press the 'Login' button if you already have an existing account created.
+    
+  <img src="readme_images/login.png" alt="Login" width="250">
+
+- You will be sent to an email verification screen. Please check your given email address for a verification email to verify your account.
+  
+  <img src="readme_images/verify.png" alt="Verification" width="250">
+
+  - A group member encountered a bug in their emulator where the app would crash when heading to the email verification page (others did not have any issues). The email will still send, however. If this occurs, please close the app and re-run the app. It should bring you back to the verification screen with no issues. If the screen still freezes, verify your email, then run the app again. You will be sent to the homepage.
+- Once verified, press the 'Check Verification' button to authenticate into the app.
+  - If needed, you can press the 'Resend' button to send another email. **Note:** Whenever you enter the verification screen, you will be sent another verification email to authenticate.
+
 ### Step 3: The Homepage
-  - Once authenticated, you will be greeted with the app homepage.
-     - Once authenticated, your email is added to a local sqlite database to confirm registration.
+
+- Once authenticated, you will be greeted with the app homepage.
+  
+  <img src="readme_images/homepage.png" alt="Home" width="250">
+
+  - Once authenticated, your email is added to a local SQLite database to confirm registration.
   - The homepage consists of four different buttons (Vehicles, Trip, Service, Help).
-     - See below for functionality of each page
+    - See below for the functionality of each page.
   - There is a sign-out button in the top-right corner of the appbar should you want to log out of the app.
   - There is a menu icon at the top-left corner of the appbar. Pressing this reveals a sidebar with your profile details.
-     - There is an avatar you can press to change your profile picture (using your camera roll or the camera itself).
-     - This profile picture will be saved locally with your account.
+    
+  <img src="readme_images/homepage_sidebar.png" alt="Home Sidebar" width="250">
+
+  - There is an avatar you can press to change your profile picture (using your camera roll or the camera itself).
+    
+    <img src="readme_images/profile_picture1.png" alt="ppic1" width="250">
+    <img src="readme_images/profile_picture2.png" alt="ppic2" width="250">
+    
+  - This profile picture will be saved locally with your account.
 
 ### Homepage buttons: Vehicles
-  - The Vehicles tab allows the user to add any of their vehicles into a list.
-  - There is a menu icon in the top-left corner of the appbar, this will open a sidebar that allows navigation to other pages in the app.
+
+- The Vehicles tab allows the user to add any of their vehicles into a list.
+  
+  <img src="readme_images/vehicle_page.png" alt="vehicle" width="250">
+
+  - There is a menu icon in the top-left corner of the appbar; this will open a sidebar that allows navigation to other pages in the app.
+    
+  <img src="readme_images/menu_sidebar.png" alt="menu" width="250">
+  
   - There are edit and delete icons in the top-right corner of the appbar for any existing vehicles.
   - Initially, the list will be empty. Press the floating action button in the bottom-right corner to add a new vehicle.
 
 #### Vehicle Edit Page:
-  - This page will allow you to add any relevant details about the car you are adding (name, color, etc.)
+
+- This page will allow you to add any relevant details about the car you are adding (name, color, etc.)
+  
+  <img src="readme_images/register_vehicle.png" alt="register" width="250">
+  <img src="readme_images/vehicle_details.png" alt="details" width="250">
+  
   - Some fields are required, while others are optional.
   - Once finished, your vehicle will be added to the Vehicles list.
 
 ### Homepage buttons: Trip
-  - This page will have a map and geolocation/geocoding functionality to plot a route for one of your vehicles. Statistics such as mileage and distance will be displayed before the trip starts.
-  - There is a menu icon in the top-left corner of the appbar, this will open a sidebar that allows navigation to other pages in the app.
+
+- This page will have a map and geolocation/geocoding functionality to plot a route for one of your vehicles. Statistics such as mileage and distance will be displayed before the trip starts.
+  
+  <img src="readme_images/trip_page.png" alt="trip" width="250">
+
+  - There is a menu icon in the top-left corner of the appbar; this will open a sidebar that allows navigation to other pages in the app.
   - UNDER CONSTRUCTION
 
-### Homepage buttons: Service  
-  - This page will display several statistics regarding the service of your vehicle, and gather recommendations through an api for your personal vehicle added to the app.
-  - There is a menu icon in the top-left corner of the appbar, this will open a sidebar that allows navigation to other pages in the app.
+### Homepage buttons: Service
+
+- This page will display several statistics regarding the service of your vehicle and gather recommendations through an API for your personal vehicle added to the app.
+  
+  <img src="readme_images/service_page.png" alt="service" width="250">
+  
+  - There is a menu icon in the top-left corner of the appbar; this will open a sidebar that allows navigation to other pages in the app.
   - UNDER CONSTRUCTION
 
 ### Homepage buttons: Help
-  - This page will eventually connect with an OpenAI api where the user can ask for any help or information regarding their vehicles
-  - There is a menu icon in the top-left corner of the appbar, this will open a sidebar that allows navigation to other pages in the app.
-  - UNDER CONSTRUCTION  
+
+- This page will eventually connect with an OpenAI API where the user can ask for any help or information regarding their vehicles
+  
+  <img src="readme_images/help_page.png" alt="help" width="250">
+
+  - There is a menu icon in the top-left corner of the appbar; this will open a sidebar that allows navigation to other pages in the app.
+  - UNDER CONSTRUCTION
 
 ## Overview
 This group project is designed for you to demonstrate the skills that you have learned in this course.  The final project that you submit in the last week of classes will be a completed mobile application.  Non-functional requirements, especially those associated with production-readiness, will be considered extremely important when marking this project.  You are expected to work in a group of three to five students when completing this project.  Students are not permitted to work alone on the project, as this eliminates one of the learning objectives of this assessment. Peer feedback forms will be required for all three phases of the project to ensure group equity of work.
