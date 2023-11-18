@@ -3,6 +3,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'address_complete.dart';
 import 'network_utility.dart';
+import 'gas.dart';
 class TripPage extends StatefulWidget {
   @override
   _TripPageState createState() => _TripPageState();
@@ -12,37 +13,43 @@ class _TripPageState extends State<TripPage> {
   String _country = 'Unknown';
   String _source = 'Source';
   String _destination = 'Destination';
-  List<AutocompletePrediction> placePredictions = [];
+  List<AutocompletePrediction> sourcePredictions = [];
+  List<AutocompletePrediction> destinationPredictions = [];
 
   TextEditingController sourceController = TextEditingController();
   TextEditingController destinationController = TextEditingController();
 
-  Future<void> placeAutocomplete(String query) async {
-    Uri uri = Uri.https(
-      "maps.googleapis.com",
-      'maps/api/place/autocomplete/json',
-      {
-        "input": query,
-        "key": 'AIzaSyCK3IDVz6IGqf09tf0dUHf1r_7Ig_tq4N0',
-      },
-    );
-    String? response = await NetworkUtility.fetchUrl(uri);
+  Future<void> placeAutocomplete(String query, bool isSource) async {
+  Uri uri = Uri.https(
+    "maps.googleapis.com",
+    'maps/api/place/autocomplete/json',
+    {
+      "input": query,
+      "key": 'AIzaSyCK3IDVz6IGqf09tf0dUHf1r_7Ig_tq4N0',
+    },
+  );
+  String? response = await NetworkUtility.fetchUrl(uri);
 
-    if (response != null) {
-      PlaceAutocompleteResponse result =
-          PlaceAutocompleteResponse.parseAutocompleteResult(response);
-      if (result.predictions != null) {
-        setState(() {
-          placePredictions = result.predictions!;
-        });
-      }
+  if (response != null) {
+    PlaceAutocompleteResponse result =
+        PlaceAutocompleteResponse.parseAutocompleteResult(response);
+    if (result.predictions != null) {
+      setState(() {
+        if (isSource) {
+          sourcePredictions = result.predictions!;
+        } else {
+          destinationPredictions = result.predictions!;
+        }
+      });
     }
   }
+}
 
   void updateSearchBar(String? selectedLocation, TextEditingController controller) {
   controller.text = selectedLocation ?? '';
   setState(() {
-    placePredictions = [];
+    sourcePredictions = [];
+    destinationPredictions = [];
   });
 }
 
@@ -87,7 +94,8 @@ class _TripPageState extends State<TripPage> {
   }
 
   void _checkGasPrice() {
-    String gasPrice = '2.50'; // Placeholder value
+    String gasPrice = "2.50";
+    getGasPrice(); // Placeholder value
     _displayGasPrice(gasPrice);
   }
 
@@ -130,7 +138,7 @@ class _TripPageState extends State<TripPage> {
                   child: TextField(
                     controller: sourceController,
                     onChanged: (value) {
-                      placeAutocomplete(value);
+                      placeAutocomplete(value,true);
                     },
                     decoration: InputDecoration(
                       labelText: 'From',
@@ -140,18 +148,18 @@ class _TripPageState extends State<TripPage> {
                 ),
               ],
             ),
-            if (placePredictions.isNotEmpty)
+            if (sourcePredictions.isNotEmpty)
               Expanded(
                 child: Container(
                   color: Colors.grey[200],
                   child: ListView.builder(
-                    itemCount: placePredictions.length,
+                    itemCount: sourcePredictions.length,
                     itemBuilder: (context, index) {
                       return ListTile(
-                        title: Text(placePredictions[index].description ?? ''),
+                        title: Text(sourcePredictions[index].description ?? ''),
                         onTap: () {
                           updateSearchBar(
-                              placePredictions[index].description,
+                              sourcePredictions[index].description,
                               sourceController);
                         },
                       );
@@ -166,7 +174,7 @@ class _TripPageState extends State<TripPage> {
                   child: TextField(
                     controller: destinationController,
                     onChanged: (value) {
-                      placeAutocomplete(value);
+                      placeAutocomplete(value,false);
                     },
                     decoration: InputDecoration(
                       labelText: 'To',
@@ -176,18 +184,18 @@ class _TripPageState extends State<TripPage> {
                 ),
               ],
             ),
-            if (placePredictions.isNotEmpty)
+            if (destinationPredictions.isNotEmpty)
               Expanded(
                 child: Container(
                   color: Colors.grey[200],
                   child: ListView.builder(
-                    itemCount: placePredictions.length,
+                    itemCount: destinationPredictions.length,
                     itemBuilder: (context, index) {
                       return ListTile(
-                        title: Text(placePredictions[index].description ?? ''),
+                        title: Text(destinationPredictions[index].description ?? ''),
                         onTap: () {
                           updateSearchBar(
-                              placePredictions[index].description,
+                              destinationPredictions[index].description,
                               destinationController);
                         },
                       );

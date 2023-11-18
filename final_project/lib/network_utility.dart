@@ -6,10 +6,11 @@ class NetworkUtility {
     try{
       final response = await http.get(uri, headers: headers);
       if (response.statusCode == 200){
+        print("hello works?");
         return response.body;
       }
     } catch (e){
-      debugPrint(e.toString());
+      print(e.toString());
     }
     return null;
   }
