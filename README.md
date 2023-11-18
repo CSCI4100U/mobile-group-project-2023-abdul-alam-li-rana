@@ -94,7 +94,7 @@
 
 - This page will have a map and geolocation/geocoding functionality to plot a route for one of your vehicles. Statistics such as mileage and distance will be displayed before the trip starts.
   
-  <img src="readme_images/trip_page.png" alt="trip" width="250">
+  <img src="readme_images/trip_page.png" alt="trip" width="250">   <img src="readme_images/maps_request.png" alt="request" width="250"> 
 
   - There is a menu icon in the top-left corner of the appbar; this will open a sidebar that allows navigation to other pages in the app.
   - UNDER CONSTRUCTION
