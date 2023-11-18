@@ -22,9 +22,9 @@ void main() async {
     appId: "1:1021555712825:android:5bf312f690a25fecaa3ee8",
   );
 
-  // Initialize Firebase with the constructed options
   await Firebase.initializeApp(options: options);
   FirebaseAuth auth = FirebaseAuth.instance;
+
 
 
   runApp(MyApp());

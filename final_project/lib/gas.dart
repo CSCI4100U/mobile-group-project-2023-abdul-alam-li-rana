@@ -21,18 +21,18 @@ Future<dynamic> getGasPrice() async {
     );
 
     if (response.statusCode == 200) {
-      // Successfully received response
+
       Map<String, dynamic> data = json.decode(response.body);
       print('Gas Price Data: $data');
       return data;
     } else {
-      // Handle non-200 status codes
+
       print('Error Code: ${response.statusCode}');
       print('Error: ${response.reasonPhrase}');
       print('Response Body: ${response.body}');
     }
   } catch (error) {
-    // Handle other errors, such as network errors
+
     print('Error: $error');
   }
 }

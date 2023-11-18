@@ -137,13 +137,13 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                   },
                 ),
               ),
-              const SizedBox(height: 57), // Add spacing between Resend and Check Verification buttons
+              const SizedBox(height: 57), 
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 32.0),
                 child: ElevatedButton(
                   child: const Text('Check Verification'),
                   onPressed: () {
-                    checkEmailVerified(); // Check email verification when the button is pressed.
+                    checkEmailVerified(); 
                   },
                 ),
               ),

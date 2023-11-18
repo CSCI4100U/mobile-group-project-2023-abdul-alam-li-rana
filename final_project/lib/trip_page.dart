@@ -65,12 +65,12 @@ class _TripPageState extends State<TripPage> {
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          // Handle denied permission
+          
           return;
         }
       }
       if (permission == LocationPermission.deniedForever) {
-        // Handle denied forever permission
+
         return;
       }
 
@@ -95,7 +95,7 @@ class _TripPageState extends State<TripPage> {
 
   void _checkGasPrice() {
     String gasPrice = "2.50";
-    getGasPrice(); // Placeholder value
+    getGasPrice(); 
     _displayGasPrice(gasPrice);
   }
 
@@ -131,7 +131,6 @@ class _TripPageState extends State<TripPage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Section for source and destination
             Row(
               children: [
                 Expanded(
@@ -205,7 +204,7 @@ class _TripPageState extends State<TripPage> {
               ),
             SizedBox(height: 20),
 
-            // Section for checking gas prices
+
             GestureDetector(
               onTap: _checkGasPrice,
               child: Container(
