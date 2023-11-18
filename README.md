@@ -97,6 +97,7 @@
   <img src="readme_images/trip_page.png" alt="trip" width="250">   <img src="readme_images/maps_request.png" alt="request" width="250"> 
 
   - There is a menu icon in the top-left corner of the appbar; this will open a sidebar that allows navigation to other pages in the app.
+  - This Trips Pages makes requests too both the Google Maps API to query addresses, and to a GAS API that will return the current average price of gas in the users location. This page fulfills the HTTP request requirements of this part of the Checkin.
   - UNDER CONSTRUCTION
 
 ### Homepage buttons: Service
