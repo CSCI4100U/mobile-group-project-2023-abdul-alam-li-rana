@@ -8,18 +8,17 @@ class EditVehicle extends StatefulWidget {
 
   @override
   _EditVehicleState createState() => _EditVehicleState(vehicleToEdit: vehicleToEdit);
-
 }
 
-
 class _EditVehicleState extends State<EditVehicle> {
-  final Vehicle vehicleToEdit;
-
   final TextEditingController makeController;
   final TextEditingController modelController;
   final TextEditingController yearController;
   final TextEditingController colorController;
   final TextEditingController vinController;
+  final TextEditingController mileageController;
+  final TextEditingController fuelCapacityController;
+  final Vehicle vehicleToEdit;
   String errorMessage = '';
 
   _EditVehicleState({required this.vehicleToEdit})
@@ -27,7 +26,9 @@ class _EditVehicleState extends State<EditVehicle> {
         modelController = TextEditingController(text: vehicleToEdit.model),
         yearController = TextEditingController(text: vehicleToEdit.year),
         colorController = TextEditingController(text: vehicleToEdit.color),
-        vinController = TextEditingController(text: vehicleToEdit.vin);
+        vinController = TextEditingController(text: vehicleToEdit.vin),
+        mileageController = TextEditingController(text: vehicleToEdit.mileage),
+        fuelCapacityController = TextEditingController(text: vehicleToEdit.fuelCapacity);
 
   @override
   Widget build(BuildContext context) {
@@ -39,14 +40,26 @@ class _EditVehicleState extends State<EditVehicle> {
             Navigator.pop(context);
           },
         ),
-        backgroundColor: Colors.blue, 
+        backgroundColor: Colors.blue,
         title: Text('Edit your Vehicle'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: <Widget>[
-               TextField(
+            TextField(
+              controller: mileageController,
+              decoration: InputDecoration(
+                labelText: 'Mileage',
+              ),
+            ),
+            TextField(
+              controller: fuelCapacityController,
+              decoration: InputDecoration(
+                labelText: 'Fuel Capacity',
+              ),
+            ),
+            TextField(
               controller: makeController,
               decoration: InputDecoration(
                 labelText: 'Make*',
@@ -87,19 +100,19 @@ class _EditVehicleState extends State<EditVehicle> {
           String year = yearController.text;
           String color = colorController.text;
           String vin = vinController.text;
-
-            
-            
-
+          String mileage = mileageController.text;
+          String fuelCapacity = fuelCapacityController.text;
 
           if (make.isNotEmpty && model.isNotEmpty && year.isNotEmpty) {
             Vehicle updatedVehicle = Vehicle(
-            id: vehicleToEdit.id,
-            make: make,
-            model: model,
-            year: year,
-            color: color,
-            vin: vin,
+              id: vehicleToEdit.id,
+              make: make,
+              model: model,
+              year: year,
+              color: color,
+              vin: vin,
+              mileage: mileage,
+              fuelCapacity: fuelCapacity,
             );
             updateVehicle(updatedVehicle);
             Navigator.pop(context, updatedVehicle);
@@ -108,10 +121,8 @@ class _EditVehicleState extends State<EditVehicle> {
               errorMessage = 'Please fill in the required fields.';
             });
           }
-
         },
         backgroundColor: Colors.blue,
-
         child: Icon(Icons.save),
       ),
     );

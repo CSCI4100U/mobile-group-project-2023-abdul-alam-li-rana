@@ -75,6 +75,8 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                 _buildTableRow('Year', _currentVehicle.year),
                 _buildTableRow('Color', _currentVehicle.color),
                 _buildTableRow('VIN', _currentVehicle.vin),
+                _buildTableRow('Mileage', _currentVehicle.mileage),
+                _buildTableRow('Fuel Capacity', _currentVehicle.fuelCapacity),
                 // Add other properties as needed
               ],
             ),

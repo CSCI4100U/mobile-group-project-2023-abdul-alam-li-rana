@@ -13,6 +13,8 @@ class _AddVehicleState extends State<AddVehicle> {
   final TextEditingController yearController = TextEditingController();
   final TextEditingController colorController = TextEditingController();
   final TextEditingController vinController = TextEditingController();
+  final TextEditingController mileageController = TextEditingController(); // Add this line
+  final TextEditingController fuelCapacityController = TextEditingController(); // Add this line
 
   String generateUniqueId() {
     String uniqueId = DateTime.now().toUtc().toIso8601String();
@@ -64,6 +66,14 @@ class _AddVehicleState extends State<AddVehicle> {
               controller: vinController,
               decoration: InputDecoration(labelText: 'VIN'),
             ),
+            TextField(
+              controller: mileageController,
+              decoration: InputDecoration(labelText: 'Mileage'), // Add this line
+            ),
+            TextField(
+              controller: fuelCapacityController,
+              decoration: InputDecoration(labelText: 'Fuel Capacity'), // Add this line
+            ),
             if (errorMessage.isNotEmpty)
               Text(
                 errorMessage,
@@ -79,6 +89,8 @@ class _AddVehicleState extends State<AddVehicle> {
           String year = yearController.text;
           String color = colorController.text;
           String vin = vinController.text;
+          String mileage = mileageController.text; // Add this line
+          String fuelCapacity = fuelCapacityController.text; // Add this line
 
           if (make.isNotEmpty && model.isNotEmpty && year.isNotEmpty) {
             String id = generateUniqueId();
@@ -89,6 +101,8 @@ class _AddVehicleState extends State<AddVehicle> {
               year: year,
               color: color,
               vin: vin,
+              mileage: mileage,
+              fuelCapacity: fuelCapacity,
             );
 
             insertVehicle(newVehicle);

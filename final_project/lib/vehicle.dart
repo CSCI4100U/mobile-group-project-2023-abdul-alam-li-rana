@@ -5,6 +5,8 @@ class Vehicle {
   final String model;
   final String year;
   final String color;
+  final String mileage; // Add this line
+  final String fuelCapacity; // Add this line
 
   Vehicle({
     required this.id,
@@ -12,7 +14,9 @@ class Vehicle {
     required this.model,
     required this.year,
     this.vin = '',
-    this.color = '', 
+    this.color = '',
+    this.mileage = '', // Initialize mileage
+    this.fuelCapacity = '', // Initialize fuelCapacity
   });
 
   factory Vehicle.fromMap(Map<String, dynamic> map) {
@@ -23,6 +27,8 @@ class Vehicle {
       year: map['year'] as String? ?? '',
       color: map['color'] as String? ?? '', // Initialize VIN from map.
       vin: map['vin'] as String? ?? '', // Initialize VIN from map.
+      mileage: map['mileage'] as String? ?? '', // Initialize mileage from map.
+      fuelCapacity: map['fuelCapacity'] as String? ?? '', // Initialize fuelCapacity from map.
     );
   }
 
@@ -34,11 +40,13 @@ class Vehicle {
       'year': year,
       'color': color,
       'vin': vin, // Include VIN in the map.
+      'mileage': mileage, // Include mileage in the map.
+      'fuelCapacity': fuelCapacity, // Include fuelCapacity in the map.
     };
   }
 
   @override
   String toString() {
-    return 'Vehicle{id: $id, vin: $vin, make: $make, model: $model, year: $year, color: $color}';
+    return 'Vehicle{id: $id, vin: $vin, make: $make, model: $model, year: $year, color: $color, mileage: $mileage, fuelCapacity: $fuelCapacity}';
   }
 }
