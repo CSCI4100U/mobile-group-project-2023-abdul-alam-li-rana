@@ -29,6 +29,7 @@ class _TripPageState extends State<TripPage> {
   String? routeGeometry;
   LatLng? _userLocation;
   bool isRoutePlotted = false;
+  double? _totalDistance;
   List<PointLatLng>? routePoints;
 
   @override
@@ -44,6 +45,7 @@ class _TripPageState extends State<TripPage> {
     clearPolyline();
     String sourceAddress = sourceController.text;
     String destinationAddress = destinationController.text;
+    double routeDistance = 0.0;
 
     if (sourceAddress.isEmpty || destinationAddress.isEmpty) {
       // Handle the case where either source or destination address is empty
@@ -82,10 +84,24 @@ class _TripPageState extends State<TripPage> {
 
         if (result.points.isNotEmpty) {
           // The route points are available in result.points
-
           routePoints = result.points[0];
 
-          // Now you can use the routePoints to draw polylines on the map or perform other tasks.
+          for (int i = 0; i < routePoints!.length - 1; i++){
+            double segmentDistance = Geolocator.distanceBetween(
+              routePoints![i].latitude,
+              routePoints![i].longitude, 
+              routePoints![i + 1].latitude, 
+              routePoints![i + 1].longitude,
+              );
+            
+            routeDistance += segmentDistance;
+          }
+          
+          setState(() {
+            _totalDistance = routeDistance / 1000.0; // Convert to kilometers
+          });
+
+          //use routePoints to draw polylines on the map or perform other tasks.
           drawPolylineOnMap();
           print('Route Points: $routePoints');
         } else {
@@ -97,6 +113,8 @@ class _TripPageState extends State<TripPage> {
     } catch (e) {
       print('Error: $e');
     }
+
+
   }
 
   void drawPolylineOnMap() {
@@ -122,12 +140,12 @@ class _TripPageState extends State<TripPage> {
   }
 
   void clearPolyline() {
-  // Check if the MapboxMapController is initialized
-  if (_controller != null) {
-    // Clear existing polylines on the map
-    _controller!.clearLines();
+    // Check if the MapboxMapController is initialized
+    if (_controller != null) {
+      // Clear existing polylines on the map
+      _controller!.clearLines();
+    }
   }
-}
 
   Future<void> placeAutocomplete(String query, bool isSource) async {
     Uri uri = Uri.https(
@@ -350,7 +368,7 @@ class _TripPageState extends State<TripPage> {
                 initialCameraPosition: CameraPosition(
                   target:
                       LatLng(_userLocation!.latitude, _userLocation!.longitude),
-                      //LatLng(43.9515, -78.8567),
+                  //LatLng(43.9515, -78.8567),
                   zoom: 12.0,
                 ),
                 onMapCreated: (MapboxMapController controller) {
@@ -362,6 +380,10 @@ class _TripPageState extends State<TripPage> {
                 },
               ),
             ),
+            if (_totalDistance != null)
+              Padding(padding: const EdgeInsets.all(8.0),
+              child: Text('Total Distance: ${_totalDistance!.toStringAsFixed(2)} Kilometers'),
+              )
           ],
         ),
       ),
