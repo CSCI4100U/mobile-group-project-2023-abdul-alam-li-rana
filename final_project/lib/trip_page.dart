@@ -9,6 +9,8 @@ import 'address_complete.dart';
 import 'network_utility.dart';
 import 'gas.dart';
 import 'package:mapbox_polyline_points/mapbox_polyline_points.dart';
+import 'vehicle.dart';
+import 'dbops.dart';
 
 class TripPage extends StatefulWidget {
   @override
@@ -32,10 +34,46 @@ class _TripPageState extends State<TripPage> {
   double? _totalDistance;
   List<PointLatLng>? routePoints;
 
+  Vehicle? _selectedVehicle;
+  List<Vehicle> _userVehicles = [];
+
   @override
   void initState() {
     super.initState();
     _getCurrentLocation();
+  }
+
+  Future<void> _loadUserVehicles() async {
+    // Load user's vehicles when the page is initialized
+    List<Vehicle> vehicles = await getVehicle();
+    setState(() {
+      _userVehicles = vehicles;
+    });
+  }
+
+  Future<List<DropdownMenuItem<Vehicle>>> _buildDropdownMenuItems() async {
+    List<Vehicle> vehicles = await getVehicle();
+
+    return vehicles.map((Vehicle vehicle) {
+      return DropdownMenuItem<Vehicle>(
+        value: vehicle,
+        key: ValueKey<String>(vehicle.id),
+        child: Text("${vehicle.make} ${vehicle.model} (${vehicle.year})"),
+      );
+    }).toList();
+  }
+
+  void _onVehicleSelected(Vehicle? selectedVehicle) {
+    setState(() {
+      _selectedVehicle = selectedVehicle != null
+          ? Vehicle(
+              id: selectedVehicle.id,
+              make: selectedVehicle.make,
+              model: selectedVehicle.model,
+              year: selectedVehicle.year,
+            )
+          : null;
+    });
   }
 
   Future<void> fetchRouteInformation() async {
@@ -86,17 +124,17 @@ class _TripPageState extends State<TripPage> {
           // The route points are available in result.points
           routePoints = result.points[0];
 
-          for (int i = 0; i < routePoints!.length - 1; i++){
+          for (int i = 0; i < routePoints!.length - 1; i++) {
             double segmentDistance = Geolocator.distanceBetween(
               routePoints![i].latitude,
-              routePoints![i].longitude, 
-              routePoints![i + 1].latitude, 
+              routePoints![i].longitude,
+              routePoints![i + 1].latitude,
               routePoints![i + 1].longitude,
-              );
-            
+            );
+
             routeDistance += segmentDistance;
           }
-          
+
           setState(() {
             _totalDistance = routeDistance / 1000.0; // Convert to kilometers
           });
@@ -113,8 +151,6 @@ class _TripPageState extends State<TripPage> {
     } catch (e) {
       print('Error: $e');
     }
-
-
   }
 
   void drawPolylineOnMap() {
@@ -327,6 +363,28 @@ class _TripPageState extends State<TripPage> {
                   ),
                 ),
               ),
+
+            FutureBuilder<List<DropdownMenuItem<Vehicle>>>(
+              future: _buildDropdownMenuItems(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return CircularProgressIndicator(); // or a loading indicator
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else {
+                  return DropdownButton<Vehicle>(
+                    value: _selectedVehicle,
+                    items: snapshot.data ?? [],
+                    onChanged: _onVehicleSelected,
+                    hint: Text('Select a Vehicle'),
+                    isExpanded:
+                        true, // Allow the dropdown to take the full width
+                    underline: Container(), // Remove the default underline
+                  );
+                }
+              },
+            ),
+
             SizedBox(height: 20),
             GestureDetector(
               onTap: _checkGasPrice,
@@ -381,8 +439,10 @@ class _TripPageState extends State<TripPage> {
               ),
             ),
             if (_totalDistance != null)
-              Padding(padding: const EdgeInsets.all(8.0),
-              child: Text('Total Distance: ${_totalDistance!.toStringAsFixed(2)} Kilometers'),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                    'Total Distance: ${_totalDistance!.toStringAsFixed(2)} Kilometers'),
               )
           ],
         ),
