@@ -161,6 +161,7 @@ class _TripPageState extends State<TripPage> {
     setState(() {
       sourcePredictions = [];
       destinationPredictions = [];
+      isRoutePlotted = false;
     });
   }
 
@@ -337,7 +338,6 @@ class _TripPageState extends State<TripPage> {
                 if (!isRoutePlotted) {
                   // Call the method to fetch and plot the route
                   fetchRouteInformation();
-                  isRoutePlotted = true; // Update the flag
                 }
               },
               child: Text('Plot Route'),
