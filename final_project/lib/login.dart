@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'auth_functions.dart';
 import 'verification_screen.dart';
@@ -20,6 +22,8 @@ class _LoginFormState extends State<LoginForm> {
   String fullname = '';
   bool login = false;
   String errorMessage = '';
+  bool stayLoggedIn = false;
+  
 
   @override
   Widget build(BuildContext context) 
@@ -97,6 +101,16 @@ class _LoginFormState extends State<LoginForm> {
                   });
                 },
               ),
+              if (login)
+              CheckboxListTile(
+                title: Text('Stay Signed In?'),
+                value: stayLoggedIn,
+                onChanged: (signin){
+                setState(() {
+                  stayLoggedIn = signin!;
+                  print('Status = $stayLoggedIn');
+                });
+              }),
               SizedBox(
                 height: 30,
               ),
