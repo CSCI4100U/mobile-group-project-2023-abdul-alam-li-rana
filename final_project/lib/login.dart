@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'auth_functions.dart';
 import 'verification_screen.dart';
@@ -23,6 +24,12 @@ class _LoginFormState extends State<LoginForm> {
   bool login = false;
   String errorMessage = '';
   bool stayLoggedIn = false;
+
+   @override
+  void initState() {
+    super.initState();
+    final auth = FirebaseAuth.instanceFor(app: Firebase.app(), persistence: Persistence.NONE);
+  }
   
 
   @override
@@ -109,6 +116,9 @@ class _LoginFormState extends State<LoginForm> {
                 setState(() {
                   stayLoggedIn = signin!;
                   print('Status = $stayLoggedIn');
+                        FirebaseAuth.instance.setPersistence(stayLoggedIn
+                            ? Persistence.LOCAL
+                            : Persistence.NONE);
                 });
               }),
               SizedBox(
