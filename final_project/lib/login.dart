@@ -110,7 +110,7 @@ class _LoginFormState extends State<LoginForm> {
               ),
               if (login)
               CheckboxListTile(
-                title: Text('Stay Signed In?'),
+                title: Text('Stay Signed In? (Web Only)'),
                 value: stayLoggedIn,
                 onChanged: (signin){
                 setState(() {
