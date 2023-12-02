@@ -31,6 +31,7 @@ class _HomePageState extends State<HomePage> {
     FirebaseAuth.instance.currentUser?.reload();
     // Call _readAccounts when the widget initializes (once)
     _readAccounts();
+    //AccountModel().deleteAllAccounts(); //ONLY USE TO CLEAR LOCAL DATABASE
   }
 
   @override

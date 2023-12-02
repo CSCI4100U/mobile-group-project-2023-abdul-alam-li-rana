@@ -70,4 +70,13 @@ class AccountModel{
       whereArgs: [email],
     );
   }
+
+  Future<int> deleteAllAccounts() async {
+  // This needs to be present in any queries, updates, etc.
+  // you do with your database
+  final db = await DBUtils.init();
+  print("Local Storage Cleared!");
+  return db.delete('accounts');
+}
+
 }
