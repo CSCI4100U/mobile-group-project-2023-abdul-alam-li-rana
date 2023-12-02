@@ -43,54 +43,52 @@ class _EditVehicleState extends State<EditVehicle> {
         backgroundColor: Colors.blue,
         title: Text('Edit your Vehicle'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: <Widget>[
-            TextField(
-              controller: mileageController,
-              decoration: InputDecoration(
-                labelText: 'Mileage',
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: <Widget>[
+              TextField(
+                controller: makeController,
+                decoration: InputDecoration(
+                  labelText: 'Make*',
+                ),
               ),
-            ),
-            TextField(
-              controller: fuelCapacityController,
-              decoration: InputDecoration(
-                labelText: 'Fuel Capacity',
+              TextField(
+                controller: modelController,
+                decoration: InputDecoration(
+                  labelText: 'Model*',
+                ),
               ),
-            ),
-            TextField(
-              controller: makeController,
-              decoration: InputDecoration(
-                labelText: 'Make*',
+              TextField(
+                controller: yearController,
+                decoration: InputDecoration(
+                  labelText: 'Year*',
+                ),
               ),
-            ),
-            TextField(
-              controller: modelController,
-              decoration: InputDecoration(
-                labelText: 'Model*',
+              TextField(
+                controller: colorController,
+                decoration: InputDecoration(labelText: 'Color'),
               ),
-            ),
-            TextField(
-              controller: yearController,
-              decoration: InputDecoration(
-                labelText: 'Year*',
+              TextField(
+                controller: vinController,
+                decoration: InputDecoration(labelText: 'VIN'),
               ),
-            ),
-            TextField(
-              controller: colorController,
-              decoration: InputDecoration(labelText: 'Color'),
-            ),
-            TextField(
-              controller: vinController,
-              decoration: InputDecoration(labelText: 'VIN'),
-            ),
-            if (errorMessage.isNotEmpty)
-              Text(
-                errorMessage,
-                style: TextStyle(color: Colors.red),
+              TextField(
+                controller: mileageController,
+                decoration: InputDecoration(labelText: 'Mileage'),
               ),
-          ],
+              TextField(
+                controller: fuelCapacityController,
+                decoration: InputDecoration(labelText: 'Fuel Capacity'),
+              ),
+              if (errorMessage.isNotEmpty)
+                Text(
+                  errorMessage,
+                  style: TextStyle(color: Colors.red),
+                ),
+            ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
