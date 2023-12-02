@@ -29,7 +29,7 @@ class _TripPageState extends State<TripPage> {
 
   MapboxMapController? _controller;
   String? routeGeometry;
-  LatLng? _userLocation;
+  LatLng? _userLocation; // Change to LatLng?
   bool isRoutePlotted = false;
   double? _totalDistance;
   List<PointLatLng>? routePoints;
@@ -40,7 +40,10 @@ class _TripPageState extends State<TripPage> {
   @override
   void initState() {
     super.initState();
+    _userLocation = LatLng(0.0, 0.0); // Default value
     _getCurrentLocation();
+    _loadUserVehicles(); // Load user's vehicles when the page is initialized
+
   }
 
   Future<void> _loadUserVehicles() async {
@@ -67,11 +70,11 @@ class _TripPageState extends State<TripPage> {
     setState(() {
       _selectedVehicle = selectedVehicle != null
           ? Vehicle(
-              id: selectedVehicle.id,
-              make: selectedVehicle.make,
-              model: selectedVehicle.model,
-              year: selectedVehicle.year,
-            )
+        id: selectedVehicle.id,
+        make: selectedVehicle.make,
+        model: selectedVehicle.model,
+        year: selectedVehicle.year,
+      )
           : null;
     });
   }
@@ -93,23 +96,25 @@ class _TripPageState extends State<TripPage> {
     try {
       List<Location> sourceLocations = await locationFromAddress(sourceAddress);
       List<Location> destinationLocations =
-          await locationFromAddress(destinationAddress);
+      await locationFromAddress(destinationAddress);
 
       print('Source Locations: $sourceLocations');
       print('Destination Locations: $destinationLocations');
 
       if (sourceLocations.isNotEmpty && destinationLocations.isNotEmpty) {
         LatLng sourceLatLng =
-            LatLng(sourceLocations[0].latitude, sourceLocations[0].longitude);
+        LatLng(sourceLocations[0].latitude, sourceLocations[0].longitude);
         LatLng destinationLatLng = LatLng(destinationLocations[0].latitude,
             destinationLocations[0].longitude);
+        _controller?.animateCamera(CameraUpdate.newLatLng(sourceLatLng));
+
 
         print('Source LatLng: $sourceLatLng');
         print('Destination LatLng: $destinationLatLng');
 
         MapboxpolylinePoints mapboxPolylinePoints = MapboxpolylinePoints();
         MapboxPolylineResult result =
-            await mapboxPolylinePoints.getRouteBetweenCoordinates(
+        await mapboxPolylinePoints.getRouteBetweenCoordinates(
           mapboxApiKey,
           PointLatLng(
               latitude: sourceLatLng.latitude,
@@ -196,7 +201,7 @@ class _TripPageState extends State<TripPage> {
 
     if (response != null) {
       PlaceAutocompleteResponse result =
-          PlaceAutocompleteResponse.parseAutocompleteResult(response);
+      PlaceAutocompleteResponse.parseAutocompleteResult(response);
       if (result.predictions != null) {
         setState(() {
           if (isSource) {
@@ -209,8 +214,8 @@ class _TripPageState extends State<TripPage> {
     }
   }
 
-  void updateSearchBar(
-      String? selectedLocation, TextEditingController controller) {
+  void updateSearchBar(String? selectedLocation,
+      TextEditingController controller) {
     controller.text = selectedLocation ?? '';
     setState(() {
       sourcePredictions = [];
@@ -252,9 +257,8 @@ class _TripPageState extends State<TripPage> {
     }
   }
 
-  void _checkGasPrice() {
-    String gasPrice = "2.50";
-    getGasPrice();
+  void _checkGasPrice() async {
+    String gasPrice = await getGasPrice();
     _displayGasPrice(gasPrice);
   }
 
@@ -281,172 +285,177 @@ class _TripPageState extends State<TripPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Trip Planner'),
-      ),
-      body: Padding(
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      title: Text('Trip Planner'),
+    ),
+    body: Builder(
+      builder: (BuildContext scaffoldContext) => SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Row(
-              children: [
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height -
+                Scaffold.of(scaffoldContext).appBarMaxHeight!,
+          ),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: sourceController,
+                      onChanged: (value) {
+                        placeAutocomplete(value, true);
+                        clearPolyline();
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'From',
+                        prefixIcon: Icon(Icons.location_pin),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              if (sourcePredictions.isNotEmpty)
                 Expanded(
-                  child: TextField(
-                    controller: sourceController,
-                    onChanged: (value) {
-                      placeAutocomplete(value, true);
-                      clearPolyline();
-                    },
-                    decoration: InputDecoration(
-                      labelText: 'From',
-                      prefixIcon: Icon(Icons.location_pin),
+                  child: Container(
+                    color: Colors.grey[200],
+                    child: ListView.builder(
+                      itemCount: sourcePredictions.length,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          title: Text(sourcePredictions[index].description ?? ''),
+                          onTap: () {
+                            updateSearchBar(sourcePredictions[index].description,
+                                sourceController);
+                          },
+                        );
+                      },
                     ),
                   ),
                 ),
-              ],
-            ),
-            if (sourcePredictions.isNotEmpty)
-              Expanded(
-                child: Container(
-                  color: Colors.grey[200],
-                  child: ListView.builder(
-                    itemCount: sourcePredictions.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(sourcePredictions[index].description ?? ''),
-                        onTap: () {
-                          updateSearchBar(sourcePredictions[index].description,
-                              sourceController);
-                        },
-                      );
-                    },
+              SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: destinationController,
+                      onChanged: (value) {
+                        placeAutocomplete(value, false);
+                        clearPolyline();
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'To',
+                        prefixIcon: Icon(Icons.location_pin),
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
-            SizedBox(height: 20),
-            Row(
-              children: [
+              if (destinationPredictions.isNotEmpty)
                 Expanded(
-                  child: TextField(
-                    controller: destinationController,
-                    onChanged: (value) {
-                      placeAutocomplete(value, false);
-                      clearPolyline();
-                    },
-                    decoration: InputDecoration(
-                      labelText: 'To',
-                      prefixIcon: Icon(Icons.location_pin),
+                  child: Container(
+                    color: Colors.grey[200],
+                    child: ListView.builder(
+                      itemCount: destinationPredictions.length,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          title: Text(
+                              destinationPredictions[index].description ?? ''),
+                          onTap: () {
+                            updateSearchBar(
+                                destinationPredictions[index].description,
+                                destinationController);
+                          },
+                        );
+                      },
                     ),
                   ),
                 ),
-              ],
-            ),
-            if (destinationPredictions.isNotEmpty)
-              Expanded(
-                child: Container(
-                  color: Colors.grey[200],
-                  child: ListView.builder(
-                    itemCount: destinationPredictions.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(
-                            destinationPredictions[index].description ?? ''),
-                        onTap: () {
-                          updateSearchBar(
-                              destinationPredictions[index].description,
-                              destinationController);
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ),
 
-            FutureBuilder<List<DropdownMenuItem<Vehicle>>>(
-              future: _buildDropdownMenuItems(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator(); // or a loading indicator
-                } else if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
-                } else {
-                  return DropdownButton<Vehicle>(
-                    value: _selectedVehicle,
-                    items: snapshot.data ?? [],
-                    onChanged: _onVehicleSelected,
-                    hint: Text('Select a Vehicle'),
-                    isExpanded:
-                        true, // Allow the dropdown to take the full width
-                    underline: Container(), // Remove the default underline
-                  );
-                }
-              },
-            ),
-
-            SizedBox(height: 20),
-            GestureDetector(
-              onTap: _checkGasPrice,
-              child: Container(
-                padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.blue,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.local_gas_station, color: Colors.white),
-                    SizedBox(width: 10),
-                    Text(
-                      'Check Gas Price',
-                      style: TextStyle(color: Colors.white, fontSize: 18),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            // Button to plot GPS route
-            ElevatedButton(
-              onPressed: () {
-                // Check if the route is already plotted
-                if (!isRoutePlotted) {
-                  // Call the method to fetch and plot the route
-                  fetchRouteInformation();
-                }
-              },
-              child: Text('Plot Route'),
-            ),
-            Container(
-              height: 300, // Adjust the height as needed
-              child: MapboxMap(
-                accessToken:
-                    "sk.eyJ1IjoianVzdGZhbCIsImEiOiJjbHBoMnFzOGYwM2o5MmlxeGM1MW5wamZoIn0.RFlNRhyj0xccr7MPoULncg",
-                initialCameraPosition: CameraPosition(
-                  target:
-                      LatLng(_userLocation!.latitude, _userLocation!.longitude),
-                  //LatLng(43.9515, -78.8567),
-                  zoom: 12.0,
-                ),
-                onMapCreated: (MapboxMapController controller) {
-                  _controller = controller;
-                  // Ensure that the route is plotted when the map is created
-                  if (isRoutePlotted) {
-                    fetchRouteInformation();
+              FutureBuilder<List<DropdownMenuItem<Vehicle>>>(
+                future: _buildDropdownMenuItems(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator(); // or a loading indicator
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else {
+                    return DropdownButton<Vehicle>(
+                      value: _selectedVehicle,
+                      items: snapshot.data ?? [],
+                      onChanged: _onVehicleSelected,
+                      hint: Text('Select a Vehicle'),
+                      isExpanded:
+                      true, // Allow the dropdown to take the full width
+                      underline: Container(), // Remove the default underline
+                    );
                   }
                 },
               ),
-            ),
-            if (_totalDistance != null)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                    'Total Distance: ${_totalDistance!.toStringAsFixed(2)} Kilometers'),
-              )
-          ],
+
+              SizedBox(height: 20),
+              GestureDetector(
+                onTap: _checkGasPrice,
+                child: Container(
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.local_gas_station, color: Colors.white),
+                      SizedBox(width: 10),
+                      Text(
+                        'Check Gas Price',
+                        style: TextStyle(color: Colors.white, fontSize: 18),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              // Button to plot GPS route
+              ElevatedButton(
+                onPressed: () {
+                  // Check if the route is already plotted
+                  if (!isRoutePlotted) {
+                    // Call the method to fetch and plot the route
+                    fetchRouteInformation();
+                  }
+                },
+                child: Text('Plot Route'),
+              ),
+              Container(
+                height: 300,
+                child: MapboxMap(
+                  accessToken: "your_mapbox_access_token",
+                  initialCameraPosition: CameraPosition(
+                    target: _userLocation ?? LatLng(0.0, 0.0),
+                    zoom: 12.0,
+                  ),
+                  onMapCreated: (MapboxMapController controller) {
+                    _controller = controller;
+                    if (isRoutePlotted) {
+                      fetchRouteInformation();
+                    }
+                  },
+                ),
+              ),
+              if (_totalDistance != null)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                      'Total Distance: ${_totalDistance!.toStringAsFixed(2)} Kilometers'),
+                )
+            ],
+          ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 }
