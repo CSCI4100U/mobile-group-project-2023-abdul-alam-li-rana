@@ -4,6 +4,7 @@ import 'package:geocoding/geocoding.dart';
 import 'address_complete.dart';
 import 'network_utility.dart';
 import 'gas.dart';
+
 class TripPage extends StatefulWidget {
   @override
   _TripPageState createState() => _TripPageState();
@@ -20,78 +21,73 @@ class _TripPageState extends State<TripPage> {
   TextEditingController destinationController = TextEditingController();
 
   Future<void> placeAutocomplete(String query, bool isSource) async {
-  Uri uri = Uri.https(
-    "maps.googleapis.com",
-    'maps/api/place/autocomplete/json',
-    {
-      "input": query,
-      "key": 'AIzaSyCK3IDVz6IGqf09tf0dUHf1r_7Ig_tq4N0',
-    },
-  );
-  String? response = await NetworkUtility.fetchUrl(uri);
-
-  if (response != null) {
-    PlaceAutocompleteResponse result =
-        PlaceAutocompleteResponse.parseAutocompleteResult(response);
-    if (result.predictions != null) {
-      setState(() {
-        if (isSource) {
-          sourcePredictions = result.predictions!;
-        } else {
-          destinationPredictions = result.predictions!;
-        }
-      });
-    }
+    // ... (same as before)
   }
-}
 
-  void updateSearchBar(String? selectedLocation, TextEditingController controller) {
-  controller.text = selectedLocation ?? '';
-  setState(() {
-    sourcePredictions = [];
-    destinationPredictions = [];
-  });
-}
+  Future<void> getLocation() async {
+    LocationPermission permission = await Geolocator.checkPermission();
 
-  @override
-  void initState() {
-    super.initState();
-    _getCurrentLocation();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+
+      if (permission == LocationPermission.denied) {
+        // Handle the case where the user denies permission
+        return;
+      }
+    }
+
+    // Now you have the permission to access the location
+    await _getCurrentLocation();
   }
 
   Future<void> _getCurrentLocation() async {
     try {
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          
-          return;
-        }
-      }
-      if (permission == LocationPermission.deniedForever) {
-
-        return;
-      }
-
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
 
-      List<Placemark> placemarks = await placemarkFromCoordinates(
-        position.latitude,
-        position.longitude,
-      );
+      double latitude = position.latitude;
+      double longitude = position.longitude;
 
-      String country = placemarks.first.country ?? 'Unknown';
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(latitude, longitude);
 
-      setState(() {
-        _country = country;
-      });
+      if (placemarks != null && placemarks.isNotEmpty) {
+        Placemark mostLikely = placemarks[0];
+        setState(() {
+          _country = mostLikely.country ?? 'Unknown';
+          _source = _country; // Set the source to the country for demonstration
+        });
+        print('Country: $_country');
+      } else {
+        setState(() {
+          _country = 'Unknown';
+          _source = _country;
+        });
+      }
     } catch (e) {
-      print('Error: $e');
+      print(e.toString());
+      setState(() {
+        _country = 'Error';
+        _source = _country;
+      });
     }
   }
+
+  void updateSearchBar(String? selectedLocation, TextEditingController controller) {
+    controller.text = selectedLocation ?? '';
+    setState(() {
+      sourcePredictions = [];
+      destinationPredictions = [];
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getLocation();
+  }
+  
 
   void _checkGasPrice() {
     String gasPrice = "2.50";
