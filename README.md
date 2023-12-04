@@ -5,7 +5,7 @@
 ## Group Members (3-5) (No Student IDs, Only Names and GitHub Usernames):
 
 1. Justin Li ([Ju5t1nLi](https://github.com/Ju5t1nLi))
-2. Ahad Abdul
+2. Ahad Abdul - MIA
 3. Taha Rana
 4. Rhythm Alam
 
