@@ -1,11 +1,11 @@
+import 'dart:typed_data';
+
+import 'package:final_project/account.dart';
+import 'package:final_project/db_utils.dart';
 import 'package:sqflite/sqflite.dart';
 
-import 'account.dart';
-import 'db_utils.dart';
-class AccountModel{
-  Future<int> insertAccount(Account account) async{
-    //This needs to be present in any queries, updates, etc.
-    //you do with your database
+class AccountModel {
+  Future<int> insertAccount(Account account) async {
     final db = await DBUtils.init();
     return db.insert(
       'accounts',
@@ -14,33 +14,24 @@ class AccountModel{
     );
   }
 
-  Future getAllAccounts() async{
-    //This needs to be present in any queries, updates, etc.
-    //you do with your database
+  Future<List<Account>> getAllAccounts() async {
     final db = await DBUtils.init();
-    final List maps = await db.query('accounts');
-    List result = [];
-    for (int i = 0; i < maps.length; i++){
-      result.add(
-        Account.fromMap(maps[i])
-      );
-    }
-    return result;
+    final List<Map<String, dynamic>> maps = await db.query('accounts');
+    return List.generate(
+      maps.length,
+          (i) => Account.fromMap(maps[i]),
+    );
   }
 
   Future<Account?> getAccountByEmail(String? email) async {
     final db = await DBUtils.init();
-    List<Map<String, dynamic>> maps = await db.query(
+    final List<Map<String, dynamic>> maps = await db.query(
       'accounts',
       where: 'email = ?',
       whereArgs: [email],
     );
 
-    if (maps.isNotEmpty) {
-      return Account.fromMap(maps.first);
-    } else {
-      return null;
-    }
+    return maps.isNotEmpty ? Account.fromMap(maps.first) : null;
   }
 
   void savePicture(Account account) async {
@@ -48,9 +39,7 @@ class AccountModel{
     await db.insert("profilepic", account.toMap());
   }
 
-  Future<int> updateAccount(Account account) async{
-    //This needs to be present in any queries, updates, etc.
-    //you do with your database
+  Future<int> updateAccount(Account account) async {
     final db = await DBUtils.init();
     return db.update(
       'accounts',
@@ -60,9 +49,7 @@ class AccountModel{
     );
   }
 
-  Future<int> deleteAccountById(String email) async{
-    //This needs to be present in any queries, updates, etc.
-    //you do with your database
+  Future<int> deleteAccountById(String email) async {
     final db = await DBUtils.init();
     return db.delete(
       'accounts',
@@ -72,11 +59,18 @@ class AccountModel{
   }
 
   Future<int> deleteAllAccounts() async {
-  // This needs to be present in any queries, updates, etc.
-  // you do with your database
-  final db = await DBUtils.init();
-  print("Local Storage Cleared!");
-  return db.delete('accounts');
-}
+    final db = await DBUtils.init();
+    print("Local Storage Cleared!");
+    return db.delete('accounts');
+  }
 
+  Future<int> updateProfilePicture(String email, Uint8List profilePicture) async {
+    final db = await DBUtils.init();
+    return db.update(
+      'accounts',
+      {'profilePicture': profilePicture},
+      where: 'email = ?',
+      whereArgs: [email],
+    );
+  }
 }
