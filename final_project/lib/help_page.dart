@@ -113,7 +113,7 @@ class _HelpPageState extends State<HelpPage> {
               '''Unfortunately, email addresses cannot be used more than once for an account. Please use a different email address if you would like to create another account.'''),
           ],
         ),
-      drawer: SideMenu(),
+        drawer: SideMenu(parentContext: context),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.orange,
         selectedItemColor: Colors.black,

@@ -126,7 +126,7 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
         backgroundColor: Colors.blue,
         child: Icon(Icons.add),
       ),
-      drawer: SideMenu(),
+      drawer: SideMenu(parentContext: context),
     );
   }
 
