@@ -294,7 +294,8 @@ class _TripPageState extends State<TripPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
+        child: _userLocation == null ? Center(child: CircularProgressIndicator())
+        : Column(
           children: [
             Row(
               children: [
