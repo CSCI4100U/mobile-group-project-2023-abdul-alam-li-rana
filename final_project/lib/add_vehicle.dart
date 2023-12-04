@@ -1,6 +1,9 @@
+// add_vehicle.dart
+
 import 'package:flutter/material.dart';
 import 'vehicle.dart';
 import 'dbops.dart';
+import 'notification_helper.dart';
 
 class AddVehicle extends StatefulWidget {
   @override
@@ -85,7 +88,7 @@ class _AddVehicleState extends State<AddVehicle> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
+        onPressed: () async {
           String make = makeController.text;
           String model = modelController.text;
           String year = yearController.text;
@@ -112,6 +115,11 @@ class _AddVehicleState extends State<AddVehicle> {
           } else {
             setState(() {
               errorMessage = 'Please fill in the required fields.';
+              // Show notification when there is an error
+              NotificationHelper.showNotification(
+                'Error',
+                'Please fill in all the required fields.',
+              );
             });
           }
         },
@@ -121,3 +129,4 @@ class _AddVehicleState extends State<AddVehicle> {
     );
   }
 }
+

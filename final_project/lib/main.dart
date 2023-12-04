@@ -9,6 +9,7 @@ import 'home_page.dart';
 import 'login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'verification_screen.dart';
+import 'Notifications_page.dart';
 
 void main() async {
 
