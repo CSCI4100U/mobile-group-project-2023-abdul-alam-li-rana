@@ -11,6 +11,7 @@ import 'gas.dart';
 import 'package:mapbox_polyline_points/mapbox_polyline_points.dart';
 import 'vehicle.dart';
 import 'dbops.dart';
+import 'vehicle_dropdown.dart';
 
 class TripPage extends StatefulWidget {
   @override
@@ -40,14 +41,8 @@ class _TripPageState extends State<TripPage> {
   @override
   void initState() {
     super.initState();
-
     _getCurrentLocation();
     _loadUserVehicles(); // Load user's vehicles when the page is initialized
-
-    if (_userVehicles.isNotEmpty) {
-      _onVehicleSelected(_userVehicles[0]);
-    }
-
   }
 
   Future<void> _loadUserVehicles() async {
@@ -56,17 +51,6 @@ class _TripPageState extends State<TripPage> {
     setState(() {
       _userVehicles = vehicles;
     });
-  }
-
-  Future<List<DropdownMenuItem<Vehicle>>> _buildDropdownMenuItems() async {
-
-    return _userVehicles.map((Vehicle vehicle) {
-      return DropdownMenuItem<Vehicle>(
-        value: vehicle,
-        key: ValueKey<String>(vehicle.id),
-        child: Text("${vehicle.make} ${vehicle.model} (${vehicle.year})"),
-      );
-    }).toList();
   }
 
   void _onVehicleSelected(Vehicle? selectedVehicle) {
@@ -102,25 +86,24 @@ class _TripPageState extends State<TripPage> {
     try {
       List<Location> sourceLocations = await locationFromAddress(sourceAddress);
       List<Location> destinationLocations =
-      await locationFromAddress(destinationAddress);
+          await locationFromAddress(destinationAddress);
 
       print('Source Locations: $sourceLocations');
       print('Destination Locations: $destinationLocations');
 
       if (sourceLocations.isNotEmpty && destinationLocations.isNotEmpty) {
         LatLng sourceLatLng =
-        LatLng(sourceLocations[0].latitude, sourceLocations[0].longitude);
+            LatLng(sourceLocations[0].latitude, sourceLocations[0].longitude);
         LatLng destinationLatLng = LatLng(destinationLocations[0].latitude,
             destinationLocations[0].longitude);
         _controller?.animateCamera(CameraUpdate.newLatLng(sourceLatLng));
-
 
         print('Source LatLng: $sourceLatLng');
         print('Destination LatLng: $destinationLatLng');
 
         MapboxpolylinePoints mapboxPolylinePoints = MapboxpolylinePoints();
         MapboxPolylineResult result =
-        await mapboxPolylinePoints.getRouteBetweenCoordinates(
+            await mapboxPolylinePoints.getRouteBetweenCoordinates(
           mapboxApiKey,
           PointLatLng(
               latitude: sourceLatLng.latitude,
@@ -207,7 +190,7 @@ class _TripPageState extends State<TripPage> {
 
     if (response != null) {
       PlaceAutocompleteResponse result =
-      PlaceAutocompleteResponse.parseAutocompleteResult(response);
+          PlaceAutocompleteResponse.parseAutocompleteResult(response);
       if (result.predictions != null) {
         setState(() {
           if (isSource) {
@@ -220,8 +203,8 @@ class _TripPageState extends State<TripPage> {
     }
   }
 
-  void updateSearchBar(String? selectedLocation,
-      TextEditingController controller) {
+  void updateSearchBar(
+      String? selectedLocation, TextEditingController controller) {
     controller.text = selectedLocation ?? '';
     setState(() {
       sourcePredictions = [];
@@ -254,7 +237,6 @@ class _TripPageState extends State<TripPage> {
 
       String country = placemarks.first.country ?? 'Unknown';
 
-
       setState(() {
         _userLocation = LatLng(position.latitude, position.longitude);
         _country = country;
@@ -263,8 +245,6 @@ class _TripPageState extends State<TripPage> {
       if (_controller != null) {
         _controller!.animateCamera(CameraUpdate.newLatLng(_userLocation!));
       }
-
-
     } catch (e) {
       print('Error: $e');
     }
@@ -338,9 +318,11 @@ class _TripPageState extends State<TripPage> {
                         itemCount: sourcePredictions.length,
                         itemBuilder: (context, index) {
                           return ListTile(
-                            title: Text(sourcePredictions[index].description ?? ''),
+                            title: Text(
+                                sourcePredictions[index].description ?? ''),
                             onTap: () {
-                              updateSearchBar(sourcePredictions[index].description,
+                              updateSearchBar(
+                                  sourcePredictions[index].description,
                                   sourceController);
                             },
                           );
@@ -375,7 +357,8 @@ class _TripPageState extends State<TripPage> {
                         itemBuilder: (context, index) {
                           return ListTile(
                             title: Text(
-                                destinationPredictions[index].description ?? ''),
+                                destinationPredictions[index].description ??
+                                    ''),
                             onTap: () {
                               updateSearchBar(
                                   destinationPredictions[index].description,
@@ -386,28 +369,9 @@ class _TripPageState extends State<TripPage> {
                       ),
                     ),
                   ),
-
-                FutureBuilder<List<DropdownMenuItem<Vehicle>>>(
-                  future: _buildDropdownMenuItems(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return CircularProgressIndicator(); // or a loading indicator
-                    } else if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
-                    } else {
-                      return DropdownButton<Vehicle>(
-                        value: _selectedVehicle,
-                        items: snapshot.data ?? [],
-                        onChanged: _onVehicleSelected,
-                        hint: Text('Select a Vehicle'),
-                        isExpanded:
-                        true, // Allow the dropdown to take the full width
-                        underline: Container(), // Remove the default underline
-                      );
-                    }
-                  },
-                ),
-
+                VehicleDropdown(
+                    vehicles: _userVehicles,
+                    onVehicleSelected: _onVehicleSelected),
                 SizedBox(height: 20),
                 GestureDetector(
                   onTap: _checkGasPrice,
@@ -444,7 +408,8 @@ class _TripPageState extends State<TripPage> {
                 Container(
                   height: 300,
                   child: MapboxMap(
-                    accessToken: "sk.eyJ1IjoianVzdGZhbCIsImEiOiJjbHBoMnFzOGYwM2o5MmlxeGM1MW5wamZoIn0.RFlNRhyj0xccr7MPoULncg",
+                    accessToken:
+                        "sk.eyJ1IjoianVzdGZhbCIsImEiOiJjbHBoMnFzOGYwM2o5MmlxeGM1MW5wamZoIn0.RFlNRhyj0xccr7MPoULncg",
                     initialCameraPosition: CameraPosition(
                       target: _userLocation ?? LatLng(0.0, 0.0),
                       zoom: 12.0,
@@ -470,6 +435,4 @@ class _TripPageState extends State<TripPage> {
       ),
     );
   }
-
 }
-
