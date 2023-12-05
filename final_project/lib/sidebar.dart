@@ -1,9 +1,11 @@
+// sidebar.dart
+
 import 'package:flutter/material.dart';
+import 'home_page.dart';  // Import the necessary files
 import 'vehicle_homepage.dart';
 import 'trip_page.dart';
-import 'help_page.dart';
 import 'service_page.dart';
-import 'home_page.dart';
+import 'help_page.dart';
 
 class SideMenu extends StatelessWidget {
   final BuildContext parentContext;
@@ -20,7 +22,7 @@ class SideMenu extends StatelessWidget {
             Container(
               height: 50.0,
               child: DrawerHeader(
-                margin: EdgeInsets.zero, // Add this line to remove the default margin
+                margin: EdgeInsets.zero,
                 padding: EdgeInsets.all(0.0),
                 decoration: BoxDecoration(
                   color: Colors.grey[000],
@@ -71,8 +73,6 @@ class SideMenu extends StatelessWidget {
     );
   }
 }
-
-
 class HoveringWidget extends StatefulWidget {
   final VoidCallback onTap;
   final Function(bool) onHover;
@@ -96,15 +96,9 @@ class _HoveringWidgetState extends State<HoveringWidget> {
     return MouseRegion(
       onEnter: (_) {
         widget.onHover(true);
-        setState(() {
-          isHover = true;
-        });
       },
       onExit: (_) {
         widget.onHover(false);
-        setState(() {
-          isHover = false;
-        });
       },
       child: GestureDetector(
         onTap: widget.onTap,
@@ -117,3 +111,5 @@ class _HoveringWidgetState extends State<HoveringWidget> {
     );
   }
 }
+
+
