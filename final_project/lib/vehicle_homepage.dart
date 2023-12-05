@@ -68,6 +68,12 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
                     _deleteVehicle(selectedVehicle);
                   },
                 ),
+                IconButton(
+                  icon: Icon(Icons.favorite),
+                  onPressed: () {
+                    _expandVehicle(selectedVehicle);
+                  },
+                ),
               ],
             ),
         ],
@@ -208,6 +214,18 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
     }
   }
 
+
+  void _expandVehicle(Vehicle vehicle) async {
+    final updatedVehicle = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => VehicleDetails(vehicle: vehicle),
+      ),
+    );
+
+
+  }
+
   void _deleteVehicle(Vehicle vehicle) async {
     await deleteVehicle(vehicle.id);
     await fetchVehicles();
@@ -277,4 +295,3 @@ class _VehicleHoverRegionState extends State<VehicleHoverRegion> {
     );
   }
 }
-
