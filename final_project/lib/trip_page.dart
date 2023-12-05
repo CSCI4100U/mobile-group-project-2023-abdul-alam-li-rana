@@ -9,6 +9,7 @@ import 'address_complete.dart';
 import 'network_utility.dart';
 import 'gas.dart';
 import 'package:mapbox_polyline_points/mapbox_polyline_points.dart';
+import 'sidebar.dart';
 import 'vehicle.dart';
 import 'dbops.dart';
 import 'trip_details.dart';
@@ -29,6 +30,7 @@ class _TripPageState extends State<TripPage> {
 
   TextEditingController sourceController = TextEditingController();
   TextEditingController destinationController = TextEditingController();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   MapboxMapController? _controller;
   String? routeGeometry;
@@ -310,8 +312,17 @@ class _TripPageState extends State<TripPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
-        title: Text('Trip Planner'),
+        backgroundColor: Colors.grey[900],
+        title: Text('Trip Planner',
+        style: TextStyle(color: Colors.white),),
+        leading: IconButton(
+          icon: Icon(Icons.menu),
+          onPressed: () {
+            _scaffoldKey.currentState!.openDrawer();
+          },
+        ),
       ),
       body: Builder(
         builder: (BuildContext scaffoldContext) => SingleChildScrollView(
@@ -327,6 +338,7 @@ class _TripPageState extends State<TripPage> {
                   children: [
                     Expanded(
                       child: TextField(
+                        style: TextStyle(color: Colors.white),
                         controller: sourceController,
                         onChanged: (value) {
                           placeAutocomplete(value, true);
@@ -365,6 +377,7 @@ class _TripPageState extends State<TripPage> {
                   children: [
                     Expanded(
                       child: TextField(
+                        style: TextStyle(color: Colors.white),
                         controller: destinationController,
                         onChanged: (value) {
                           placeAutocomplete(value, false);
@@ -408,7 +421,7 @@ class _TripPageState extends State<TripPage> {
                   child: Container(
                     padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: Colors.blue,
+                      color: Colors.grey[900],
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Row(
@@ -426,6 +439,9 @@ class _TripPageState extends State<TripPage> {
                 ),
                 // Button to plot GPS route
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.grey[900]
+                  ),
                   onPressed: () {
                     // Check if the route is already plotted
                     if (!isRoutePlotted) {
@@ -462,6 +478,8 @@ class _TripPageState extends State<TripPage> {
           ),
         ),
       ),
+      backgroundColor: Colors.indigo[400],
+      drawer: SideMenu(parentContext: context),
     );
   }
 }
