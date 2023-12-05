@@ -34,7 +34,7 @@ class ServicePage extends StatelessWidget {
               _buildServiceCard(context, services[index]),
         ),
       ),
-      drawer: SideMenu(),
+      drawer: SideMenu(parentContext: context),
     );
   }
 
