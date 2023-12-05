@@ -22,7 +22,17 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
   @override
   void initState() {
     super.initState();
-    noSelection = Vehicle(id: '', make: '', model: '', year: '', vin: '', color: '');
+    noSelection = Vehicle(
+      id: '',
+      make: '',
+      model: '',
+      year: '',
+      vin: '',
+      color: '',
+      type: '',
+      mileage: '',
+      fuelCapacity: '',
+    );
     selectedVehicle = noSelection;
     _vehiclesStreamController = StreamController<List<dynamic>>.broadcast();
     _hoverController = VehicleHoverController();
@@ -60,12 +70,6 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
                   icon: Icon(Icons.edit),
                   onPressed: () {
                     _editVehicle(selectedVehicle);
-                  },
-                ),
-                IconButton(
-                  icon: Icon(Icons.delete),
-                  onPressed: () {
-                    _deleteVehicle(selectedVehicle);
                   },
                 ),
               ],

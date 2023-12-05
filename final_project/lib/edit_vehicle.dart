@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'vehicle.dart';
 import 'dbops.dart';
+
 class EditVehicle extends StatefulWidget {
   final Vehicle vehicleToEdit;
 
@@ -18,6 +19,7 @@ class _EditVehicleState extends State<EditVehicle> {
   final TextEditingController vinController;
   final TextEditingController mileageController;
   final TextEditingController fuelCapacityController;
+  String selectedType = ''; // Add this variable
   final Vehicle vehicleToEdit;
   String errorMessage = '';
 
@@ -29,6 +31,22 @@ class _EditVehicleState extends State<EditVehicle> {
         vinController = TextEditingController(text: vehicleToEdit.vin),
         mileageController = TextEditingController(text: vehicleToEdit.mileage),
         fuelCapacityController = TextEditingController(text: vehicleToEdit.fuelCapacity);
+
+  // Placeholder implementation, customize based on your icons
+  Icon _getIconForVehicleType(String type) {
+    switch (type) {
+      case 'Sedan':
+        return Icon(Icons.directions_car);
+      case 'Van':
+        return Icon(Icons.local_shipping);
+      case 'SUV':
+        return Icon(Icons.directions_subway);
+      case 'Truck':
+        return Icon(Icons.local_shipping);
+      default:
+        return Icon(Icons.directions_car);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -87,6 +105,7 @@ class _EditVehicleState extends State<EditVehicle> {
                   errorMessage,
                   style: TextStyle(color: Colors.red),
                 ),
+
             ],
           ),
         ),
@@ -111,6 +130,7 @@ class _EditVehicleState extends State<EditVehicle> {
               vin: vin,
               mileage: mileage,
               fuelCapacity: fuelCapacity,
+              type: 'someType', // provide the actual value
             );
             updateVehicle(updatedVehicle);
             Navigator.pop(context, updatedVehicle);

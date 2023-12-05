@@ -7,10 +7,17 @@ import 'trip_page.dart';
 import 'service_page.dart';
 import 'help_page.dart';
 
-class SideMenu extends StatelessWidget {
+class SideMenu extends StatefulWidget {
   final BuildContext parentContext;
 
   SideMenu({required this.parentContext});
+
+  @override
+  _SideMenuState createState() => _SideMenuState();
+}
+
+class _SideMenuState extends State<SideMenu> {
+  String selectedItem = '';
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +27,7 @@ class SideMenu extends StatelessWidget {
         child: Column(
           children: <Widget>[
             Container(
-              height: 50.0,
+              height: 100.0,
               child: DrawerHeader(
                 margin: EdgeInsets.zero,
                 padding: EdgeInsets.all(0.0),
@@ -48,11 +55,20 @@ class SideMenu extends StatelessWidget {
   }
 
   Widget _buildListTile(String title, IconData icon, Color color, Widget page) {
-    final bool isSelected = ModalRoute.of(parentContext)!.settings.name == page.toString();
+    final bool isSelected = selectedItem == title;
 
     return HoveringWidget(
+      isSelected: isSelected,
       onTap: () {
-        Navigator.of(parentContext).pushReplacement(MaterialPageRoute(builder: (context) => page));
+        if (isSelected) {
+          // User clicked on the already selected item, handle accordingly (e.g., navigate to the page)
+          Navigator.of(widget.parentContext).pushReplacement(MaterialPageRoute(builder: (context) => page));
+        } else {
+          // User clicked on a different item, update the selected item
+          setState(() {
+            selectedItem = title;
+          });
+        }
       },
       onHover: (val) {
         // Handle hover effect here if needed
@@ -69,18 +85,27 @@ class SideMenu extends StatelessWidget {
           color: isSelected ? Colors.white : color,
         ),
         tileColor: isSelected ? Colors.grey[800] : null,
+        shape: isSelected
+            ? RoundedRectangleBorder(
+          side: BorderSide(color: Colors.blue, width: 2.0),
+          borderRadius: BorderRadius.circular(5.0),
+        )
+            : null,
       ),
     );
   }
 }
+
 class HoveringWidget extends StatefulWidget {
   final VoidCallback onTap;
   final Function(bool) onHover;
+  final bool isSelected; // Add this property
   final Widget child;
 
   HoveringWidget({
     required this.onTap,
     required this.onHover,
+    required this.isSelected, // Add this line
     required this.child,
   });
 
@@ -95,21 +120,30 @@ class _HoveringWidgetState extends State<HoveringWidget> {
   Widget build(BuildContext context) {
     return MouseRegion(
       onEnter: (_) {
-        widget.onHover(true);
+        if (!widget.isSelected) {
+          widget.onHover(true);
+        }
       },
       onExit: (_) {
-        widget.onHover(false);
+        if (!widget.isSelected) {
+          widget.onHover(false);
+        }
       },
       child: GestureDetector(
-        onTap: widget.onTap,
+        onTap: () {
+          widget.onTap();
+          if (widget.isSelected) {
+            widget.onHover(false);
+          } else {
+            widget.onHover(true);
+          }
+        },
         child: AnimatedContainer(
           duration: Duration(milliseconds: 200),
-          color: isHover ? Colors.grey[800] : null,
+          color: isHover || widget.isSelected ? Colors.grey[800] : null,
           child: widget.child,
         ),
       ),
     );
   }
 }
-
-
