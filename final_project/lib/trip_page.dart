@@ -40,9 +40,13 @@ class _TripPageState extends State<TripPage> {
   @override
   void initState() {
     super.initState();
-    _userLocation = LatLng(0.0, 0.0); // Default value
+
     _getCurrentLocation();
     _loadUserVehicles(); // Load user's vehicles when the page is initialized
+
+    if (_userVehicles.isNotEmpty) {
+      _onVehicleSelected(_userVehicles[0]);
+    }
 
   }
 
@@ -55,9 +59,8 @@ class _TripPageState extends State<TripPage> {
   }
 
   Future<List<DropdownMenuItem<Vehicle>>> _buildDropdownMenuItems() async {
-    List<Vehicle> vehicles = await getVehicle();
 
-    return vehicles.map((Vehicle vehicle) {
+    return _userVehicles.map((Vehicle vehicle) {
       return DropdownMenuItem<Vehicle>(
         value: vehicle,
         key: ValueKey<String>(vehicle.id),
@@ -68,15 +71,18 @@ class _TripPageState extends State<TripPage> {
 
   void _onVehicleSelected(Vehicle? selectedVehicle) {
     setState(() {
-      _selectedVehicle = selectedVehicle != null
-          ? Vehicle(
-        id: selectedVehicle.id,
-        make: selectedVehicle.make,
-        model: selectedVehicle.model,
-        year: selectedVehicle.year,
-      )
-          : null;
+      _selectedVehicle = selectedVehicle;
     });
+
+    if (_selectedVehicle != null) {
+      final snackBar = SnackBar(
+        content: Text(
+            '${_selectedVehicle!.make} ${_selectedVehicle!.model} (${_selectedVehicle!.year}) Selected.'),
+        duration: Duration(seconds: 2),
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
   }
 
   Future<void> fetchRouteInformation() async {
