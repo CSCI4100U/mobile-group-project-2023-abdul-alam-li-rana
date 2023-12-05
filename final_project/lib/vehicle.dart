@@ -16,11 +16,11 @@ class Vehicle {
     required this.make,
     required this.model,
     required this.year,
-    required this.vin,
-    required this.color,
-    required this.type,
-    required this.mileage,
-    required this.fuelCapacity,
+    this.vin = '',
+    this.color = '',
+    this.type = '',
+    this.mileage = '',
+    this.fuelCapacity = '',
   });
 
 
