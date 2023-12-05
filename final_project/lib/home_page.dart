@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Vehicle Management App',
+      title: 'Vroom Vroom',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -81,8 +81,8 @@ class _HomePageState extends State<HomePage> {
             icon: Icon(Icons.logout),
           )
         ],
-        backgroundColor: Colors.lightBlue,
-        title: Text('Vehicle Management App'),
+        backgroundColor: Colors.grey[900],
+        title: Text('Vroom Vroom'),
         centerTitle: true,
         automaticallyImplyLeading: false,
         leading: IconButton(
@@ -197,16 +197,7 @@ class _HomePageState extends State<HomePage> {
 
           return Drawer(
             child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0xFF3366FF),
-                    Color(0xFF6633FF),
-                  ],
-                ),
-              ),
+              color: Colors.grey[900],
               child: ListView(
                 children: [
                   DrawerHeader(
@@ -221,8 +212,8 @@ class _HomePageState extends State<HomePage> {
                             _showDialog(context);
                           },
                           child: Container(
-                            width: 80,
-                            height: 80,
+                            width: 100,
+                            height: 100,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: Colors.white,
