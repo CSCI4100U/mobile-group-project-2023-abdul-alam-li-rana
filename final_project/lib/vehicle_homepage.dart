@@ -55,7 +55,9 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text('Vehicle List'),
+        backgroundColor: Colors.grey[900],
+        title: Text('Vehicle List',
+        style: TextStyle(color: Colors.white)),
         leading: IconButton(
           icon: Icon(Icons.menu),
           onPressed: () {
@@ -70,6 +72,12 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
                   icon: Icon(Icons.edit),
                   onPressed: () {
                     _editVehicle(selectedVehicle);
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.favorite),
+                  onPressed: () {
+                    _expandVehicle(selectedVehicle);
                   },
                 ),
               ],
@@ -153,7 +161,7 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
         onPressed: () {
           _navigateToAddVehicle();
         },
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.grey[900],
         child: Icon(Icons.add),
       ),
       drawer: SideMenu(parentContext: context),
@@ -220,6 +228,18 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
         selectedVehicle = noSelection;
       });
     }
+  }
+
+
+  void _expandVehicle(Vehicle vehicle) async {
+    final updatedVehicle = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => VehicleDetails(vehicle: vehicle),
+      ),
+    );
+
+
   }
 
   void _deleteVehicle(Vehicle vehicle) async {
@@ -305,5 +325,4 @@ class _VehicleHoverRegionState extends State<VehicleHoverRegion> {
     );
   }
 }
-
 

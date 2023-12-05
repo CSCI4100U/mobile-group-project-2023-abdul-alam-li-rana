@@ -31,10 +31,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     );
     flutterLocalNotificationsPlugin.initialize(initializationSettings);
     */
-    checkEmailVerified(); 
+    checkEmailVerified();
     FirebaseAuth.instance.currentUser?.sendEmailVerification();
-    
-    
   }
 
   checkEmailVerified() async {
@@ -45,14 +43,11 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     });
 
     if (isEmailVerified) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Email Successfully Verified")));
-         Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => MyApp()),
-        (route) => false);
-        
-    }/*else{
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Email Successfully Verified")));
+      Navigator.pushAndRemoveUntil(context,
+          MaterialPageRoute(builder: (context) => MyApp()), (route) => false);
+    } /*else{
       await flutterLocalNotificationsPlugin.show(
         0,
         'Email Not Verified!',
@@ -76,7 +71,10 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-            automaticallyImplyLeading: false, // This line prevents the back button
+          title: Text('Verification'),
+          automaticallyImplyLeading:
+              false, // This line prevents the back button
+          backgroundColor: Colors.grey[900],
           actions: [
             IconButton(
               onPressed: () async {
@@ -86,16 +84,28 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
             )
           ],
         ),
-        body: SingleChildScrollView(
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color(0xFF3366FF),
+                Color(0xFF6633FF),
+              ],
+            ),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 35),
               const SizedBox(height: 30),
-              const Center(
+              Center(
                 child: Text(
-                  'Check your \n Email',
+                  'We have sent you an email to ${auth.currentUser?.email}',
                   textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
                 ),
               ),
               const SizedBox(height: 8),
@@ -103,8 +113,10 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 32.0),
                 child: Center(
                   child: Text(
-                    'We have sent you an Email on ${auth.currentUser?.email}',
+                    'Check your inbox!',
                     textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.white),
                   ),
                 ),
               ),
@@ -119,6 +131,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                   child: Text(
                     'Verifying email....',
                     textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.white),
                   ),
                 ),
               ),
@@ -126,23 +140,28 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 32.0),
                 child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey[900]),
                   child: const Text('Resend'),
                   onPressed: () {
                     try {
-                      FirebaseAuth.instance.currentUser?.sendEmailVerification();
+                      FirebaseAuth.instance.currentUser
+                          ?.sendEmailVerification();
                     } catch (e) {
                       debugPrint('$e');
                     }
                   },
                 ),
               ),
-              const SizedBox(height: 57), 
+              const SizedBox(height: 57),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 32.0),
                 child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey[900]),
                   child: const Text('Check Verification'),
                   onPressed: () {
-                    checkEmailVerified(); 
+                    checkEmailVerified();
                   },
                 ),
               ),

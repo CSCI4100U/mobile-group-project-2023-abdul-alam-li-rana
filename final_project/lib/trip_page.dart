@@ -11,6 +11,9 @@ import 'gas.dart';
 import 'package:mapbox_polyline_points/mapbox_polyline_points.dart';
 import 'vehicle.dart';
 import 'dbops.dart';
+import 'trip_details.dart';
+import 'vehicle_dropdown.dart';
+
 
 class TripPage extends StatefulWidget {
   @override
@@ -29,9 +32,10 @@ class _TripPageState extends State<TripPage> {
 
   MapboxMapController? _controller;
   String? routeGeometry;
-  LatLng? _userLocation;
+  LatLng? _userLocation; // Change to LatLng?
   bool isRoutePlotted = false;
   double? _totalDistance;
+  double? _gasPrice;
   List<PointLatLng>? routePoints;
 
   Vehicle? _selectedVehicle;
@@ -41,11 +45,7 @@ class _TripPageState extends State<TripPage> {
   void initState() {
     super.initState();
     _getCurrentLocation();
-    _loadUserVehicles();
-
-    if (_userVehicles.isNotEmpty) {
-      _onVehicleSelected(_userVehicles[0]);
-    }
+    _loadUserVehicles(); // Load user's vehicles when the page is initialized
   }
 
   Future<void> _loadUserVehicles() async {
@@ -54,16 +54,6 @@ class _TripPageState extends State<TripPage> {
     setState(() {
       _userVehicles = vehicles;
     });
-  }
-
-  Future<List<DropdownMenuItem<Vehicle>>> _buildDropdownMenuItems() async {
-    return _userVehicles.map((Vehicle vehicle) {
-      return DropdownMenuItem<Vehicle>(
-        value: vehicle,
-        key: ValueKey<String>(vehicle.id),
-        child: Text("${vehicle.make} ${vehicle.model} (${vehicle.year})"),
-      );
-    }).toList();
   }
 
   void _onVehicleSelected(Vehicle? selectedVehicle) {
@@ -109,6 +99,7 @@ class _TripPageState extends State<TripPage> {
             LatLng(sourceLocations[0].latitude, sourceLocations[0].longitude);
         LatLng destinationLatLng = LatLng(destinationLocations[0].latitude,
             destinationLocations[0].longitude);
+        _controller?.animateCamera(CameraUpdate.newLatLng(sourceLatLng));
 
         print('Source LatLng: $sourceLatLng');
         print('Destination LatLng: $destinationLatLng');
@@ -253,16 +244,46 @@ class _TripPageState extends State<TripPage> {
         _userLocation = LatLng(position.latitude, position.longitude);
         _country = country;
       });
+
+      if (_controller != null) {
+        _controller!.animateCamera(CameraUpdate.newLatLng(_userLocation!));
+      }
     } catch (e) {
       print('Error: $e');
     }
   }
 
-  void _checkGasPrice() {
-    String gasPrice = "2.50";
-    getGasPrice();
-    _displayGasPrice(gasPrice);
+  Future<void> _checkGasPrice() async {
+    try {
+      String? gasPriceString = await getGasPrice(); // Assuming getGasPrice() returns a Future<String>
+
+      double? gasPrice;
+
+      if (gasPriceString != null && gasPriceString != "None") {
+        print(gasPriceString);
+        gasPrice = double.tryParse(gasPriceString);
+
+        if (gasPrice == null) {
+          print('Error: Unable to parse gasPriceString to double');
+        }
+      } else {
+        print('Warning: Gas price is null. Using default value.');
+      }
+
+      setState(() {
+
+        _gasPrice = gasPrice ?? 2.50; // Use the parsed gas price or default to $2.50
+        print(_gasPrice);
+      });
+    } catch (error) {
+      print('Error fetching or processing gas price: $error');
+      setState(() {
+        _gasPrice = 2.50; // Default to $2.50 in case of an error
+      });
+    }
   }
+
+
 
   void _displayGasPrice(String gasPrice) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -292,169 +313,155 @@ class _TripPageState extends State<TripPage> {
       appBar: AppBar(
         title: Text('Trip Planner'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: _userLocation == null ? Center(child: CircularProgressIndicator())
-        : Column(
-          children: [
-            Row(
+      body: Builder(
+        builder: (BuildContext scaffoldContext) => SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height -
+                  Scaffold.of(scaffoldContext).appBarMaxHeight!,
+            ),
+            child: Column(
               children: [
-                Expanded(
-                  child: TextField(
-                    controller: sourceController,
-                    onChanged: (value) {
-                      placeAutocomplete(value, true);
-                      clearPolyline();
-                    },
-                    decoration: InputDecoration(
-                      labelText: 'From',
-                      prefixIcon: Icon(Icons.location_pin),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            if (sourcePredictions.isNotEmpty)
-              Expanded(
-                child: Container(
-                  color: Colors.grey[200],
-                  child: ListView.builder(
-                    itemCount: sourcePredictions.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(sourcePredictions[index].description ?? ''),
-                        onTap: () {
-                          updateSearchBar(sourcePredictions[index].description,
-                              sourceController);
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ),
-            SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: destinationController,
-                    onChanged: (value) {
-                      placeAutocomplete(value, false);
-                      clearPolyline();
-                    },
-                    decoration: InputDecoration(
-                      labelText: 'To',
-                      prefixIcon: Icon(Icons.location_pin),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            if (destinationPredictions.isNotEmpty)
-              Expanded(
-                child: Container(
-                  color: Colors.grey[200],
-                  child: ListView.builder(
-                    itemCount: destinationPredictions.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(
-                            destinationPredictions[index].description ?? ''),
-                        onTap: () {
-                          updateSearchBar(
-                              destinationPredictions[index].description,
-                              destinationController);
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ),
-
-            FutureBuilder<List<DropdownMenuItem<Vehicle>>>(
-              future: _buildDropdownMenuItems(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator(); // or a loading indicator
-                } else if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
-                } else {
-                  return DropdownButton<Vehicle>(
-                    value: _selectedVehicle,
-                    items: snapshot.data ?? [],
-                    onChanged: _onVehicleSelected,
-                    hint: Text('Select a Vehicle'),
-                    isExpanded:
-                        true, // Allow the dropdown to take the full width
-                    underline: Container(), // Remove the default underline
-                  );
-                }
-              },
-            ),
-
-            SizedBox(height: 20),
-            GestureDetector(
-              onTap: _checkGasPrice,
-              child: Container(
-                padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.blue,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                Row(
                   children: [
-                    Icon(Icons.local_gas_station, color: Colors.white),
-                    SizedBox(width: 10),
-                    Text(
-                      'Check Gas Price',
-                      style: TextStyle(color: Colors.white, fontSize: 18),
+                    Expanded(
+                      child: TextField(
+                        controller: sourceController,
+                        onChanged: (value) {
+                          placeAutocomplete(value, true);
+                          clearPolyline();
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'From',
+                          prefixIcon: Icon(Icons.location_pin),
+                        ),
+                      ),
                     ),
                   ],
                 ),
-              ),
-            ),
-            // Button to plot GPS route
-            ElevatedButton(
-              onPressed: () {
-                // Check if the route is already plotted
-                if (!isRoutePlotted) {
-                  // Call the method to fetch and plot the route
-                  fetchRouteInformation();
-                }
-              },
-              child: Text('Plot Route'),
-            ),
-            Container(
-              height: 300, // Adjust the height as needed
-              child: MapboxMap(
-                accessToken:
-                    "sk.eyJ1IjoianVzdGZhbCIsImEiOiJjbHBoMnFzOGYwM2o5MmlxeGM1MW5wamZoIn0.RFlNRhyj0xccr7MPoULncg",
-                initialCameraPosition: CameraPosition(
-                  target:
-                      LatLng(_userLocation!.latitude, _userLocation!.longitude),
-                  //LatLng(43.9515, -78.8567),
-                  zoom: 12.0,
+                if (sourcePredictions.isNotEmpty)
+                  Expanded(
+                    child: Container(
+                      color: Colors.grey[200],
+                      child: ListView.builder(
+                        itemCount: sourcePredictions.length,
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            title: Text(
+                                sourcePredictions[index].description ?? ''),
+                            onTap: () {
+                              updateSearchBar(
+                                  sourcePredictions[index].description,
+                                  sourceController);
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: destinationController,
+                        onChanged: (value) {
+                          placeAutocomplete(value, false);
+                          clearPolyline();
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'To',
+                          prefixIcon: Icon(Icons.location_pin),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                onMapCreated: (MapboxMapController controller) {
-                  _controller = controller;
-                  // Ensure that the route is plotted when the map is created
-                  if (isRoutePlotted) {
-                    fetchRouteInformation();
-                  }
-                },
-              ),
+                if (destinationPredictions.isNotEmpty)
+                  Expanded(
+                    child: Container(
+                      color: Colors.grey[200],
+                      child: ListView.builder(
+                        itemCount: destinationPredictions.length,
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            title: Text(
+                                destinationPredictions[index].description ??
+                                    ''),
+                            onTap: () {
+                              updateSearchBar(
+                                  destinationPredictions[index].description,
+                                  destinationController);
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                VehicleDropdown(
+                    vehicles: _userVehicles,
+                    onVehicleSelected: _onVehicleSelected),
+                SizedBox(height: 20),
+                GestureDetector(
+                  onTap: _checkGasPrice,
+                  child: Container(
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.local_gas_station, color: Colors.white),
+                        SizedBox(width: 10),
+                        Text(
+                          'Check Gas Price',
+                          style: TextStyle(color: Colors.white, fontSize: 18),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                // Button to plot GPS route
+                ElevatedButton(
+                  onPressed: () {
+                    // Check if the route is already plotted
+                    if (!isRoutePlotted) {
+                      // Call the method to fetch and plot the route
+                      fetchRouteInformation();
+                    }
+                  },
+                  child: Text('Plot Route'),
+                ),
+                Container(
+                  height: 300,
+                  child: MapboxMap(
+                    accessToken:
+                        "sk.eyJ1IjoianVzdGZhbCIsImEiOiJjbHBoMnFzOGYwM2o5MmlxeGM1MW5wamZoIn0.RFlNRhyj0xccr7MPoULncg",
+                    initialCameraPosition: CameraPosition(
+                      target: _userLocation ?? LatLng(0.0, 0.0),
+                      zoom: 12.0,
+                    ),
+                    onMapCreated: (MapboxMapController controller) {
+                      _controller = controller;
+                      if (isRoutePlotted) {
+                        fetchRouteInformation();
+                      }
+                    },
+                  ),
+                ),
+                TripDetailsWidget(
+                  totalDistance: _totalDistance,
+                  gasPrice: _gasPrice,
+                  vehicle: _selectedVehicle ?? null,
+                ),
+              ],
             ),
-            if (_totalDistance != null)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                    'Total Distance: ${_totalDistance!.toStringAsFixed(2)} Kilometers'),
-              )
-          ],
+          ),
         ),
       ),
     );
   }
 }
-

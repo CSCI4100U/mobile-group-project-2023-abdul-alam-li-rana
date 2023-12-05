@@ -1,6 +1,8 @@
 import 'package:final_project/help_page.dart';
 import 'package:flutter/material.dart';
 
+import 'sidebar.dart';
+
 class AiHelp extends StatefulWidget {
   @override
   _AiHelpState createState() => _AiHelpState();
@@ -13,10 +15,12 @@ class _AiHelpState extends State<AiHelp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.orangeAccent,
+      backgroundColor: Colors.amber,
+      key: _scaffoldKey,
       appBar: AppBar(
-        backgroundColor: Colors.orange,
-        title: Text('AI Help'),
+        backgroundColor: Colors.grey[900],
+        title: Text('AI Help',
+        style: TextStyle(color: Colors.white),),
         leading: IconButton(
           icon: Icon(Icons.menu),
           onPressed: () {
@@ -26,10 +30,11 @@ class _AiHelpState extends State<AiHelp> {
       ),
       body: Center(
       ),
+      drawer: SideMenu(parentContext: context),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.orange,
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.white,
+        backgroundColor: Colors.grey[900],
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.grey[500],
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
