@@ -20,7 +20,7 @@ class SideMenu extends StatelessWidget {
         child: Column(
           children: <Widget>[
             Container(
-              height: 50.0,
+              height: 100.0,
               child: DrawerHeader(
                 margin: EdgeInsets.zero,
                 padding: EdgeInsets.all(0.0),

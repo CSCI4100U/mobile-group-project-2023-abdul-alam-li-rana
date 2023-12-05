@@ -22,7 +22,17 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
   @override
   void initState() {
     super.initState();
-    noSelection = Vehicle(id: '', make: '', model: '', year: '', vin: '', color: '');
+    noSelection = Vehicle(
+      id: '',
+      make: '',
+      model: '',
+      year: '',
+      vin: '',
+      color: '',
+      type: '',
+      mileage: '',
+      fuelCapacity: '',
+    );
     selectedVehicle = noSelection;
     _vehiclesStreamController = StreamController<List<dynamic>>.broadcast();
     _hoverController = VehicleHoverController();
@@ -60,12 +70,6 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
                   icon: Icon(Icons.edit),
                   onPressed: () {
                     _editVehicle(selectedVehicle);
-                  },
-                ),
-                IconButton(
-                  icon: Icon(Icons.delete),
-                  onPressed: () {
-                    _deleteVehicle(selectedVehicle);
                   },
                 ),
                 IconButton(
@@ -123,17 +127,27 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
                           child: Card(
                             elevation: 2.0,
                             margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-                            child: ListTile(
-                              title: Text(
-                                '${vehicle.make} ${vehicle.model} (${vehicle.year})',
-                                style: TextStyle(
-                                  fontSize: 22,
-                                  color: _hoverController.isHovered(vehicle)
-                                      ? Colors.blue
-                                      : Colors.black,
-                          ),
-                        ),
-                      ),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: selectedVehicle.id == vehicle.id
+                                      ? Colors.black // Outline color for the selected vehicle
+                                      : Colors.transparent,
+                                  width: 2.0,
+                                ),
+                              ),
+                              child: ListTile(
+                                title: Text(
+                                  '${vehicle.make} ${vehicle.model} (${vehicle.year})',
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    color: _hoverController.isHovered(vehicle)
+                                        ? Colors.blue
+                                        : Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ),
                     ),
                 ));
               },
@@ -269,10 +283,22 @@ class VehicleHoverRegion extends StatefulWidget {
 }
 
 class _VehicleHoverRegionState extends State<VehicleHoverRegion> {
+  bool isTapped = false;
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: widget.onTap,
+      onTap: () {
+        widget.onTap();
+        setState(() {
+          isTapped = true;
+        });
+        Future.delayed(Duration(milliseconds: 150), () {
+          setState(() {
+            isTapped = false;
+          });
+        });
+      },
       child: MouseRegion(
         onEnter: (_) {
           widget.hoverController.hover(widget.vehicle);
@@ -283,7 +309,9 @@ class _VehicleHoverRegionState extends State<VehicleHoverRegion> {
         child: Container(
           decoration: BoxDecoration(
             border: Border.all(
-              color: widget.hoverController.isHovered(widget.vehicle)
+              color: isTapped
+                  ? Colors.blue
+                  : widget.hoverController.isHovered(widget.vehicle)
                   ? Colors.blue
                   : Colors.transparent,
               width: 2.0,
@@ -295,3 +323,4 @@ class _VehicleHoverRegionState extends State<VehicleHoverRegion> {
     );
   }
 }
+

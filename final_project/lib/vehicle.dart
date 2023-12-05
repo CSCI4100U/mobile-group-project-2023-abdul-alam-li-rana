@@ -1,23 +1,29 @@
+
 class Vehicle {
   final String id;
-  final String vin; // VIN is still an attribute.
   final String make;
   final String model;
   final String year;
+  final String vin;
   final String color;
-  final String mileage; // Add this line
-  final String fuelCapacity; // Add this line
+  final String type;
+  static const List<String> vehicleTypes = ['Sedan', 'SUV', 'Truck', 'Van', 'Motorcycle'];
+  final String mileage;
+  final String fuelCapacity;
 
   Vehicle({
     required this.id,
     required this.make,
     required this.model,
     required this.year,
-    this.vin = '',
-    this.color = '',
-    this.mileage = '', // Initialize mileage
-    this.fuelCapacity = '', // Initialize fuelCapacity
+    required this.vin,
+    required this.color,
+    required this.type,
+    required this.mileage,
+    required this.fuelCapacity,
   });
+
+
 
   factory Vehicle.fromMap(Map<String, dynamic> map) {
     return Vehicle(
@@ -28,7 +34,7 @@ class Vehicle {
       color: map['color'] as String? ?? '', // Initialize VIN from map.
       vin: map['vin'] as String? ?? '', // Initialize VIN from map.
       mileage: map['mileage'] as String? ?? '', // Initialize mileage from map.
-      fuelCapacity: map['fuelCapacity'] as String? ?? '', // Initialize fuelCapacity from map.
+      fuelCapacity: map['fuelCapacity'] as String? ?? '', type: '', // Initialize fuelCapacity from map.
     );
   }
 
