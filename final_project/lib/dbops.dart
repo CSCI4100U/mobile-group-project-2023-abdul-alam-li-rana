@@ -3,15 +3,15 @@ import 'package:sqflite/sqflite.dart';
 import 'main.dart';
 import 'package:path/path.dart';
 import 'vehicle.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'dart:math';
-
+import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
 
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+final FirebaseStorage firestorage = FirebaseStorage.instance;
 final FirebaseAuth auth = FirebaseAuth.instance;
 final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
@@ -72,4 +72,17 @@ String generateVerificationCode() {
   // Generate a random 6-digit verification code
   final random = Random();
   return (100000 + random.nextInt(900000)).toString();
+}
+
+Future<void> addImage(String vehicleId, String imagePath) async {
+  try {
+    print(vehicleId);
+
+    await FirebaseFirestore.instance.collection('vehicles').doc(vehicleId).collection('images').add({
+      'imageUrl': imagePath,
+    });
+
+  } catch (e) {
+    print('Error uploading image: $e');
+  }
 }
