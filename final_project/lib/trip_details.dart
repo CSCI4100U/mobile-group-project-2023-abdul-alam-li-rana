@@ -43,11 +43,11 @@ class TripDetailsWidget extends StatelessWidget {
           if (totalDistance != null && totalDistance != 0.0)
             Text('Total Distance: ${totalDistance!.toStringAsFixed(2)} Kilometers'),
           if (gasPrice != null && gasPrice != 0.0)
-            Text('Gas Price: ${gasPrice!.toStringAsFixed(2)}'),
+            Text('Gas Price \$: ${gasPrice!.toStringAsFixed(2)}'),
           if (fuelConsumed != null && fuelConsumed != 0.0)
             Text('Fuel Consumed: ${fuelConsumed.toStringAsFixed(2)} Liters'),
           if (costOfTrip != null && costOfTrip != 0.0)
-            Text('Cost of Trip: ${costOfTrip.toStringAsFixed(2)}'),
+            Text('Cost of Trip \$: ${costOfTrip.toStringAsFixed(2)}'),
         ],
       ),
     );
