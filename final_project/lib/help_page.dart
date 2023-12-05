@@ -15,18 +15,18 @@ class _HelpPageState extends State<HelpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.orangeAccent,
+      backgroundColor: Colors.amber,
       key: _scaffoldKey,
       appBar: AppBar(
-        backgroundColor: Colors.orange,
+        backgroundColor: Colors.grey[900],
         title: Text(
           'FAQs',
-          style: TextStyle(color: Colors.black)
+          style: TextStyle(color: Colors.white)
           ),
         leading: IconButton(
           icon: Icon(
             Icons.menu,
-            color: Colors.black,
+            color: Colors.white,
             ),
           onPressed: () {
             _scaffoldKey.currentState!.openDrawer();
@@ -115,9 +115,9 @@ class _HelpPageState extends State<HelpPage> {
         ),
         drawer: SideMenu(parentContext: context),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.orange,
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.white,
+        backgroundColor: Colors.grey[900],
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.grey[500],
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -160,7 +160,7 @@ class _HelpPageState extends State<HelpPage> {
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
-                      backgroundColor: Colors.orange,
+                      backgroundColor: Colors.amber,
                       title: Text(title),
                       content: Text(details),
                       actions: [
@@ -169,7 +169,7 @@ class _HelpPageState extends State<HelpPage> {
                               Navigator.pop(context); // Close the dialog
                             },
                             style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.orangeAccent),
+                                backgroundColor: Colors.amberAccent),
                             child: Text(
                               'OK',
                               style: TextStyle(color: Colors.black),
