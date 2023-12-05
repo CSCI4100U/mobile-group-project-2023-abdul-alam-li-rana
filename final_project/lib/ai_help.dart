@@ -21,6 +21,7 @@ class _AiHelpState extends State<AiHelp> {
         backgroundColor: Colors.grey[900],
         title: Text('AI Help',
         style: TextStyle(color: Colors.white),),
+        centerTitle: true,
         leading: IconButton(
           icon: Icon(Icons.menu),
           onPressed: () {

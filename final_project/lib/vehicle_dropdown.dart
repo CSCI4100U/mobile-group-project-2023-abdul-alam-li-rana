@@ -4,10 +4,12 @@ import 'vehicle.dart';
 class VehicleDropdown extends StatefulWidget {
   final List<Vehicle> vehicles;
   final Function(Vehicle?) onVehicleSelected;
+  final Color dropdownColor;
 
   const VehicleDropdown({
     required this.vehicles,
     required this.onVehicleSelected,
+    this.dropdownColor = Colors.white,
     Key? key,
   }) : super(key: key);
 
@@ -29,6 +31,7 @@ class _VehicleDropdownState extends State<VehicleDropdown> {
           return Text('Error: ${snapshot.error}');
         } else {
           return DropdownButton<Vehicle>(
+            dropdownColor: widget.dropdownColor,
             value: _selectedVehicle,
             items: snapshot.data ?? [],
             onChanged: (selectedVehicle) {
