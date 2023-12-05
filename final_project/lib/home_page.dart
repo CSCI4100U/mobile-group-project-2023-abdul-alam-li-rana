@@ -55,7 +55,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    double buttonWidth = 200.0;
+    double buttonWidth = 150.0;
     double buttonHeight = 100.0;
     TextStyle buttonTextStyle = TextStyle(
       fontSize: 16.0,

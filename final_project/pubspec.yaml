@@ -54,6 +54,7 @@ dependencies:
   flutter_local_notifications: ^8.0.0
   mapbox_polyline_points: ^0.0.6
   google_maps_flutter: ^2.0.10
+  fan_side_drawer: ^1.0.2
 
 dev_dependencies:
   flutter_test:

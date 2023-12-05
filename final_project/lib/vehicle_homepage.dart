@@ -97,9 +97,9 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
                   decoration: BoxDecoration(
                     border: Border.all(
                       color: _hoverController.isHovered(vehicle)
-                          ? Colors.blue  // Change color to blue
+                          ? Colors.blue // Change color to blue
                           : Colors.transparent,
-                      width: 2.0,  // Increase border width
+                      width: 2.0, // Increase border width
                     ),
                   ),
                   child: ListTile(
@@ -108,7 +108,7 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
                       style: TextStyle(
                         fontSize: 22,
                         color: _hoverController.isHovered(vehicle)
-                            ? Colors.blue  // Change color to blue
+                            ? Colors.blue // Change color to blue
                             : Colors.black,
                       ),
                     ),
@@ -260,3 +260,4 @@ class _VehicleHoverRegionState extends State<VehicleHoverRegion> {
     );
   }
 }
+
