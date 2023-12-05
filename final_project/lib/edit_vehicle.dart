@@ -19,6 +19,8 @@ class _EditVehicleState extends State<EditVehicle> {
   final TextEditingController vinController;
   final TextEditingController mileageController;
   final TextEditingController fuelCapacityController;
+  final TextEditingController fuelEconomyController;
+
   String selectedType = ''; // Add this variable
   final Vehicle vehicleToEdit;
   String errorMessage = '';
@@ -30,7 +32,11 @@ class _EditVehicleState extends State<EditVehicle> {
         colorController = TextEditingController(text: vehicleToEdit.color),
         vinController = TextEditingController(text: vehicleToEdit.vin),
         mileageController = TextEditingController(text: vehicleToEdit.mileage),
-        fuelCapacityController = TextEditingController(text: vehicleToEdit.fuelCapacity);
+        fuelCapacityController = TextEditingController(text: vehicleToEdit.fuelCapacity),
+        fuelEconomyController = TextEditingController(text: vehicleToEdit.fuelEconomy);
+
+
+
 
   // Placeholder implementation, customize based on your icons
   Icon _getIconForVehicleType(String type) {
@@ -94,12 +100,17 @@ class _EditVehicleState extends State<EditVehicle> {
               ),
               TextField(
                 controller: mileageController,
-                decoration: InputDecoration(labelText: 'Mileage'),
+                decoration: InputDecoration(labelText: 'Mileage (KM)'),
               ),
               TextField(
                 controller: fuelCapacityController,
-                decoration: InputDecoration(labelText: 'Fuel Capacity'),
+                decoration: InputDecoration(labelText: 'Fuel Capacity (L)'),
               ),
+              TextField(
+                controller: fuelEconomyController,
+                decoration: InputDecoration(labelText: 'Fuel Economy(L/100km)'),
+              ),
+
               if (errorMessage.isNotEmpty)
                 Text(
                   errorMessage,
@@ -119,6 +130,7 @@ class _EditVehicleState extends State<EditVehicle> {
           String vin = vinController.text;
           String mileage = mileageController.text;
           String fuelCapacity = fuelCapacityController.text;
+          String fuelEconomy = fuelEconomyController.text;
 
           if (make.isNotEmpty && model.isNotEmpty && year.isNotEmpty) {
             Vehicle updatedVehicle = Vehicle(
@@ -130,7 +142,7 @@ class _EditVehicleState extends State<EditVehicle> {
               vin: vin,
               mileage: mileage,
               fuelCapacity: fuelCapacity,
-              type: 'someType', // provide the actual value
+              fuelEconomy: fuelEconomy,
             );
             updateVehicle(updatedVehicle);
             Navigator.pop(context, updatedVehicle);

@@ -11,7 +11,7 @@ import 'gas.dart';
 import 'package:mapbox_polyline_points/mapbox_polyline_points.dart';
 import 'vehicle.dart';
 import 'dbops.dart';
-
+import 'trip_details.dart';
 class TripPage extends StatefulWidget {
   @override
   _TripPageState createState() => _TripPageState();
@@ -32,6 +32,7 @@ class _TripPageState extends State<TripPage> {
   LatLng? _userLocation; // Change to LatLng?
   bool isRoutePlotted = false;
   double? _totalDistance;
+  double? _gasPrice;
   List<PointLatLng>? routePoints;
 
   Vehicle? _selectedVehicle;
@@ -270,10 +271,37 @@ class _TripPageState extends State<TripPage> {
     }
   }
 
-  void _checkGasPrice() async {
-    String gasPrice = await getGasPrice();
-    _displayGasPrice(gasPrice);
+  Future<void> _checkGasPrice() async {
+    try {
+      String? gasPriceString = await getGasPrice(); // Assuming getGasPrice() returns a Future<String>
+
+      double? gasPrice;
+
+      if (gasPriceString != null && gasPriceString != "None") {
+        print(gasPriceString);
+        gasPrice = double.tryParse(gasPriceString);
+
+        if (gasPrice == null) {
+          print('Error: Unable to parse gasPriceString to double');
+        }
+      } else {
+        print('Warning: Gas price is null. Using default value.');
+      }
+
+      setState(() {
+
+        _gasPrice = gasPrice ?? 2.50; // Use the parsed gas price or default to $2.50
+        print(_gasPrice);
+      });
+    } catch (error) {
+      print('Error fetching or processing gas price: $error');
+      setState(() {
+        _gasPrice = 2.50; // Default to $2.50 in case of an error
+      });
+    }
   }
+
+
 
   void _displayGasPrice(String gasPrice) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -457,12 +485,11 @@ class _TripPageState extends State<TripPage> {
                     },
                   ),
                 ),
-                if (_totalDistance != null)
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                        'Total Distance: ${_totalDistance!.toStringAsFixed(2)} Kilometers'),
-                  )
+                TripDetailsWidget(
+                  totalDistance: _totalDistance,
+                  gasPrice: _gasPrice,
+                  vehicle: _selectedVehicle ?? null,
+                ),
               ],
             ),
           ),

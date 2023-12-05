@@ -154,11 +154,15 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               Text(
-                'Mileage: ${widget.vehicle.mileage}',
+                'Mileage (KM): ${widget.vehicle.mileage}',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               Text(
-                'Fuel Capacity: ${widget.vehicle.fuelCapacity}',
+                'Fuel Capacity (L): ${widget.vehicle.fuelCapacity}',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              Text(
+                'Fuel Economy (L/100KM): ${widget.vehicle.fuelCapacity}',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 20),

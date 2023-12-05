@@ -10,6 +10,8 @@ class Vehicle {
   static const List<String> vehicleTypes = ['Sedan', 'SUV', 'Truck', 'Van', 'Motorcycle'];
   final String mileage;
   final String fuelCapacity;
+  final String fuelEconomy;
+
 
   Vehicle({
     required this.id,
@@ -21,6 +23,8 @@ class Vehicle {
     this.type = '',
     this.mileage = '',
     this.fuelCapacity = '',
+    this.fuelEconomy = ''
+  ,
   });
 
 
@@ -34,7 +38,9 @@ class Vehicle {
       color: map['color'] as String? ?? '', // Initialize VIN from map.
       vin: map['vin'] as String? ?? '', // Initialize VIN from map.
       mileage: map['mileage'] as String? ?? '', // Initialize mileage from map.
-      fuelCapacity: map['fuelCapacity'] as String? ?? '', type: '', // Initialize fuelCapacity from map.
+      fuelCapacity: map['fuelCapacity'] as String? ?? '',
+      fuelEconomy: map['fuelEconomy'] as String? ?? '', // Initialize fuelCapacity from map.
+// Initialize fuelCapacity from map.
     );
   }
 
@@ -45,9 +51,11 @@ class Vehicle {
       'model': model,
       'year': year,
       'color': color,
-      'vin': vin, // Include VIN in the map.
-      'mileage': mileage, // Include mileage in the map.
-      'fuelCapacity': fuelCapacity, // Include fuelCapacity in the map.
+      'vin': vin,
+      'mileage': mileage,
+      'fuelCapacity': fuelCapacity,
+      'fuelEconomy': fuelEconomy,
+
     };
   }
 
