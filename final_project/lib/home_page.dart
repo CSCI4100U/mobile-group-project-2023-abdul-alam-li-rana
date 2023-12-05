@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Vroom Vroom',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.grey,
       ),
       home: const HomePage(),
     );
@@ -78,15 +78,26 @@ class _HomePageState extends State<HomePage> {
             onPressed: () async {
               await FirebaseAuth.instance.signOut();
             },
-            icon: Icon(Icons.logout),
+            icon: Icon(
+              Icons.logout,
+              color: Colors.white, // Set the color to white
+            ),
           )
         ],
         backgroundColor: Colors.grey[900],
-        title: Text('Vroom Vroom'),
+        title: Text(
+          'Vroom Vroom',
+          style: TextStyle(
+            color: Colors.white, // Set the color to white
+          ),
+        ),
         centerTitle: true,
         automaticallyImplyLeading: false,
         leading: IconButton(
-          icon: Icon(Icons.menu),
+          icon: Icon(
+            Icons.menu,
+            color: Colors.white, // Set the color to white
+          ),
           onPressed: () {
             _scaffoldKey.currentState?.openDrawer();
           },
@@ -105,8 +116,8 @@ class _HomePageState extends State<HomePage> {
                   Colors.teal,
                   Icons.directions_car,
                   buttonTextStyle,
-                  400.0, // Adjust the width
-                  100.0, // Adjust the height
+                  300.0,
+                  100.0,
                       () {
                     Navigator.of(context).push(MaterialPageRoute(builder: (context) => VehicleHomePage()));
                   },
@@ -117,8 +128,8 @@ class _HomePageState extends State<HomePage> {
                   Colors.indigo,
                   Icons.airplanemode_active,
                   buttonTextStyle,
-                  400.0, // Adjust the width
-                  100.0, // Adjust the height
+                  300.0,
+                  100.0,
                       () {
                     Navigator.of(context).push(MaterialPageRoute(builder: (context) => TripPage()));
                   },
@@ -128,8 +139,8 @@ class _HomePageState extends State<HomePage> {
                   Colors.pink,
                   Icons.build,
                   buttonTextStyle,
-                  400.0, // Adjust the width
-                  100.0, // Adjust the height
+                  300.0,
+                  100.0,
                       () {
                     Navigator.of(context).push(MaterialPageRoute(builder: (context) => ServicePage()));
                   },
@@ -139,8 +150,8 @@ class _HomePageState extends State<HomePage> {
                   Colors.amber,
                   Icons.help,
                   buttonTextStyle,
-                  400.0, // Adjust the width
-                  100.0, // Adjust the height
+                  300.0,
+                  100.0,
                       () {
                     Navigator.of(context).push(MaterialPageRoute(builder: (context) => HelpPage()));
                   },
@@ -286,7 +297,7 @@ class _HomePageState extends State<HomePage> {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Color(0xFF3366FF),
+            Color(0xFF3390FF),
             Color(0xFF6633FF),
           ],
         ),
@@ -333,7 +344,6 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
 
   Future<void> _showDialog(BuildContext context) {
     return showDialog<void>(

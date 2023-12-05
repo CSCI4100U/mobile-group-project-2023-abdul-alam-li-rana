@@ -55,11 +55,14 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
+        centerTitle: true,
         backgroundColor: Colors.grey[900],
-        title: Text('Vehicle List',
-        style: TextStyle(color: Colors.white)),
+        title: Text('Vehicle List', style: TextStyle(color: Colors.white)),
         leading: IconButton(
-          icon: Icon(Icons.menu),
+          icon: Icon(
+            Icons.menu,
+            color: Colors.white, // Set the color to white
+          ),
           onPressed: () {
             _scaffoldKey.currentState!.openDrawer();
           },
@@ -69,13 +72,19 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
             Row(
               children: [
                 IconButton(
-                  icon: Icon(Icons.edit),
+                  icon: Icon(
+                    Icons.edit,
+                    color: Colors.white, // Set the color to white
+                  ),
                   onPressed: () {
                     _editVehicle(selectedVehicle);
                   },
                 ),
                 IconButton(
-                  icon: Icon(Icons.favorite),
+                  icon: Icon(
+                    Icons.favorite,
+                    color: Colors.white, // Set the color to white
+                  ),
                   onPressed: () {
                     _expandVehicle(selectedVehicle);
                   },
@@ -84,12 +93,13 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
             ),
         ],
       ),
+
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Colors.cyan, Colors.blue],
+            colors: [Colors.green, Colors.tealAccent],
           ),
         ),
         child: StreamBuilder<List<dynamic>>(
@@ -100,74 +110,76 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
             return (vehicles.isEmpty
                 ? Center(child: Text('No data'))
                 : ListView.builder(
-                    itemCount: vehicles.length,
-                    itemBuilder: (context, index) {
-                      final vehicle = vehicles[index];
-                      return Dismissible(
-                        key: Key(vehicle.id),
-                        direction: DismissDirection.endToStart,
-                        onDismissed: (direction) {
-                          _deleteVehicle(vehicle);
-                        },
-                        background: Container(
-                          color: Colors.red,
-                          padding: EdgeInsets.only(right: 16),
-                          alignment: Alignment.centerRight,
-                          child: Icon(
-                            Icons.delete,
-                            color: Colors.white,
+              itemCount: vehicles.length,
+              itemBuilder: (context, index) {
+                final vehicle = vehicles[index];
+                return Dismissible(
+                  key: Key(vehicle.id),
+                  direction: DismissDirection.endToStart,
+                  onDismissed: (direction) {
+                    _deleteVehicle(vehicle);
+                  },
+                  background: Container(
+                    color: Colors.red,
+                    padding: EdgeInsets.only(right: 16),
+                    alignment: Alignment.centerRight,
+                    child: Icon(
+                      Icons.delete,
+                      color: Colors.white,
+                    ),
+                  ),
+                  child: VehicleHoverRegion(
+                    vehicle: vehicle,
+                    hoverController: _hoverController,
+                    onTap: () {
+                      setState(() {
+                        selectedVehicle = vehicle;
+                      });
+                    },
+                    child: Card(
+                      elevation: 2.0,
+                      margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: selectedVehicle.id == vehicle.id
+                                ? Colors.black
+                                : Colors.transparent,
+                            width: 2.0,
                           ),
                         ),
-                        child: VehicleHoverRegion(
-                          vehicle: vehicle,
-                          hoverController: _hoverController,
-                          onTap: () {
-                            setState(() {
-                              selectedVehicle = vehicle;
-                            });
-                          },
-                          child: Card(
-                            elevation: 2.0,
-                            margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: selectedVehicle.id == vehicle.id
-                                      ? Colors.black // Outline color for the selected vehicle
-                                      : Colors.transparent,
-                                  width: 2.0,
-                                ),
-                              ),
-                              child: ListTile(
-                                title: Text(
-                                  '${vehicle.make} ${vehicle.model} (${vehicle.year})',
-                                  style: TextStyle(
-                                    fontSize: 22,
-                                    color: _hoverController.isHovered(vehicle)
-                                        ? Colors.blue
-                                        : Colors.black,
-                                  ),
-                                ),
-                              ),
+                        child: ListTile(
+                          title: Text(
+                            '${vehicle.make} ${vehicle.model} (${vehicle.year})',
+                            style: TextStyle(
+                              fontSize: 22,
+                              color: _hoverController.isHovered(vehicle)
+                                  ? Colors.blue
+                                  : Colors.black,
                             ),
+                          ),
+                        ),
+                      ),
                     ),
-                ));
+                  ),
+                );
               },
             ));
           },
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           _navigateToAddVehicle();
         },
-        backgroundColor: Colors.grey[900],
-        child: Icon(Icons.add),
+        backgroundColor: Colors.grey[900], // Set your desired background color
+        foregroundColor: Colors.white, // Set text/icon color
+        icon: Icon(Icons.add),
+        label: Text('Add Vehicle'),
       ),
       drawer: SideMenu(parentContext: context),
     );
   }
-
 
   void _navigateToAddVehicle() async {
     final addedVehicle = await Navigator.push(
@@ -230,7 +242,6 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
     }
   }
 
-
   void _expandVehicle(Vehicle vehicle) async {
     final updatedVehicle = await Navigator.push(
       context,
@@ -238,8 +249,6 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
         builder: (context) => VehicleDetails(vehicle: vehicle),
       ),
     );
-
-
   }
 
   void _deleteVehicle(Vehicle vehicle) async {
@@ -325,4 +334,3 @@ class _VehicleHoverRegionState extends State<VehicleHoverRegion> {
     );
   }
 }
-
