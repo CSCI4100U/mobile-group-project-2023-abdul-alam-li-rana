@@ -55,7 +55,9 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text('Vehicle List'),
+        backgroundColor: Colors.grey[900],
+        title: Text('Vehicle List',
+        style: TextStyle(color: Colors.white)),
         leading: IconButton(
           icon: Icon(Icons.menu),
           onPressed: () {
@@ -159,7 +161,7 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
         onPressed: () {
           _navigateToAddVehicle();
         },
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.grey[900],
         child: Icon(Icons.add),
       ),
       drawer: SideMenu(parentContext: context),

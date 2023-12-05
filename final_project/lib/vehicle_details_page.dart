@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'expanded_image.dart';
+
 class VehicleDetails extends StatefulWidget {
   final Vehicle vehicle;
 
@@ -26,7 +27,6 @@ class _VehicleDetailsState extends State<VehicleDetails> {
   }
 
   void loadImages() {
-
     FirebaseFirestore.instance
         .collection('vehicles')
         .doc(widget.vehicle.id)
@@ -41,41 +41,35 @@ class _VehicleDetailsState extends State<VehicleDetails> {
   }
 
   Future<void> pickImageFromGallery() async {
-    XFile? pickedFile = await ImagePicker().pickImage(
-        source: ImageSource.gallery);
+    XFile? pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       await uploadAndSaveImage(pickedFile);
     }
   }
 
   Future<void> pickImageFromCamera() async {
-    XFile? pickedFile = await ImagePicker().pickImage(
-        source: ImageSource.camera);
+    XFile? pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
       await uploadAndSaveImage(pickedFile);
     }
   }
 
   Future<void> uploadAndSaveImage(XFile? image) async {
-    String uniqueFileName = DateTime
-        .now()
-        .millisecondsSinceEpoch
-        .toString();
+    String uniqueFileName = DateTime.now().millisecondsSinceEpoch.toString();
     Reference referenceRoot = FirebaseStorage.instance.ref();
     Reference referenceDirImages = referenceRoot.child('images');
     Reference referenceImageToUpload = referenceDirImages.child(uniqueFileName);
-
 
     try {
       await referenceImageToUpload.putFile(File(image!.path));
 
       var imageURL = await referenceImageToUpload.getDownloadURL();
       addImage(widget.vehicle.id, imageURL);
-    }
-    catch (error) {
+    } catch (error) {
       print("Error when trying to upload image");
     }
-
 
     // String vehicleId = widget.vehicle.id;
     // String imageUrl = await uploadImage(vehicleId, imagePath);
@@ -98,7 +92,8 @@ class _VehicleDetailsState extends State<VehicleDetails> {
 
   void deleteSelectedImage() async {
     if (selectedImageIndex != -1) {
-      await FirebaseStorage.instance.refFromURL(images[selectedImageIndex])
+      await FirebaseStorage.instance
+          .refFromURL(images[selectedImageIndex])
           .delete();
 
       await FirebaseFirestore.instance
@@ -123,93 +118,114 @@ class _VehicleDetailsState extends State<VehicleDetails> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Vehicle Details'),
+        backgroundColor: Colors.grey[900],
+        title: Text('Vehicle Details', style: TextStyle(color: Colors.white)),
       ),
-      body: SingleChildScrollView(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Colors.cyan, Colors.blue],
+          ),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(
-                'Make: ${widget.vehicle.make}',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              Text(
-                'Model: ${widget.vehicle.model}',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              Text(
-                'Year: ${widget.vehicle.year}',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              Text(
-                'Color: ${widget.vehicle.color}',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              Text(
-                'VIN: ${widget.vehicle.vin}',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              Text(
-                'Mileage (KM): ${widget.vehicle.mileage}',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              Text(
-                'Fuel Capacity (L): ${widget.vehicle.fuelCapacity}',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              Text(
-                'Fuel Economy (L/100KM): ${widget.vehicle.fuelCapacity}',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 20),
-              Text(
-                'Pictures',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              // Display existing images as tiles
+              // Vehicle Data Box
+
               Container(
-                height: 100,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: images.length,
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () => toggleImageSelection(index),
-                      child: Hero(
-                        tag: 'image$index',
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            width: 100,
-                            height: 100,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: NetworkImage(images[index]),
-                                fit: BoxFit.cover,
-                              ),
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
+                width: screenWidth,
+                padding: EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      'Make: ${widget.vehicle.make}\n',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      'Model: ${widget.vehicle.model}\n',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      'Year: ${widget.vehicle.year}\n',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      'Color: ${widget.vehicle.color}\n',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      'VIN: ${widget.vehicle.vin}\n',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                  ],
                 ),
               ),
+
+              SizedBox(height: 20),
+              // Fuel Data Box
+              Container(
+                width: screenWidth,
+                padding: EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      'Mileage (KM): ${widget.vehicle.mileage}\n',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      'Fuel Capacity (L): ${widget.vehicle.fuelCapacity}\n',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      'Fuel Economy (L/100KM): ${widget.vehicle.fuelEconomy}\n',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: 20),
+
+              // Display existing images as tiles
+              // ... (ListView.builder)
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.grey[900]),
                     onPressed: pickImageFromGallery,
                     icon: Icon(Icons.photo),
                     label: Text('Gallery'),
                   ),
                   ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.grey[900]),
                     onPressed: pickImageFromCamera,
                     icon: Icon(Icons.camera_alt),
                     label: Text('Camera'),
@@ -217,15 +233,12 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                 ],
               ),
 
+              // Expanded Image View
               if (selectedImageIndex != -1)
                 Container(
-                  // Wrap with Container to provide bounded constraints
                   constraints: BoxConstraints(
                     minHeight: 0,
-                    maxHeight: MediaQuery
-                        .of(context)
-                        .size
-                        .height,
+                    maxHeight: MediaQuery.of(context).size.height,
                   ),
                   child: ExpandedImageView(
                     imageUrl: images[selectedImageIndex],
@@ -244,7 +257,3 @@ class _VehicleDetailsState extends State<VehicleDetails> {
     );
   }
 }
-
-
-
-

@@ -1,5 +1,3 @@
-// add_vehicle.dart
-
 import 'package:flutter/material.dart';
 import 'vehicle.dart';
 import 'dbops.dart';
@@ -27,6 +25,31 @@ class _AddVehicleState extends State<AddVehicle> {
   }
 
   String errorMessage = '';
+
+  // Validation function for color
+  bool isValidColor(String color) {
+    // Customize this based on your color validation criteria
+    return color.isNotEmpty && RegExp(r'^[a-zA-Z]+$').hasMatch(color);
+  }
+
+// Validation function for VIN (allowing letters and numbers)
+  bool isValidVIN(String vin) {
+    // Customize this based on your VIN validation criteria
+    return vin.isNotEmpty && RegExp(r'^[a-zA-Z0-9]+$').hasMatch(vin);
+  }
+
+
+  // Validation function for mileage (should only be numbers)
+  bool isValidMileage(String mileage) {
+    // Customize this based on your mileage validation criteria
+    return mileage.isNotEmpty && RegExp(r'^[0-9]+$').hasMatch(mileage);
+  }
+
+  // Validation function for fuel capacity (should only be numbers)
+  bool isValidFuelCapacity(String fuelCapacity) {
+    // Customize this based on your fuel capacity validation criteria
+    return fuelCapacity.isNotEmpty && RegExp(r'^[0-9]+$').hasMatch(fuelCapacity);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -105,7 +128,7 @@ class _AddVehicleState extends State<AddVehicle> {
           String fuelEconomy = fuelEconomyController.text;
 
 
-          if (make.isNotEmpty && model.isNotEmpty && year.isNotEmpty) {
+          if (make.isNotEmpty && model.isNotEmpty && year.isNotEmpty && isValidColor(color) && isValidVIN(vin) && isValidMileage(mileage) && isValidFuelCapacity(fuelCapacity)) {
             String id = generateUniqueId();
             Vehicle newVehicle = Vehicle(
               id: id,
@@ -114,6 +137,7 @@ class _AddVehicleState extends State<AddVehicle> {
               year: year,
               color: color,
               vin: vin,
+              type: 'Sedan', // You should replace 'Sedan' with the actual type selected by the user
               mileage: mileage,
               fuelCapacity: fuelCapacity,
               fuelEconomy: fuelEconomy,
@@ -124,11 +148,11 @@ class _AddVehicleState extends State<AddVehicle> {
             Navigator.pop(context, newVehicle);
           } else {
             setState(() {
-              errorMessage = 'Please fill in the required fields.';
+              errorMessage = 'Please fill in the required fields with valid values.';
               // Show notification when there is an error
               NotificationHelper.showNotification(
                 'Error',
-                'Please fill in all the required fields.',
+                'Please fill in all the required fields with valid values.',
               );
             });
           }

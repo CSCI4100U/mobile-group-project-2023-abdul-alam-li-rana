@@ -9,6 +9,7 @@ import 'address_complete.dart';
 import 'network_utility.dart';
 import 'gas.dart';
 import 'package:mapbox_polyline_points/mapbox_polyline_points.dart';
+import 'sidebar.dart';
 import 'vehicle.dart';
 import 'dbops.dart';
 import 'trip_details.dart';
@@ -29,6 +30,7 @@ class _TripPageState extends State<TripPage> {
 
   TextEditingController sourceController = TextEditingController();
   TextEditingController destinationController = TextEditingController();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   MapboxMapController? _controller;
   String? routeGeometry;
@@ -310,32 +312,49 @@ class _TripPageState extends State<TripPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
-        title: Text('Trip Planner'),
+        backgroundColor: Colors.grey[900],
+        title: Text('Trip Planner',
+        style: TextStyle(color: Colors.white),),
+        leading: IconButton(
+          icon: Icon(Icons.menu),
+          onPressed: () {
+            _scaffoldKey.currentState!.openDrawer();
+          },
+        ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: sourceController,
-                    onChanged: (value) {
-                      placeAutocomplete(value, true);
-                      clearPolyline();
-                    },
-                    decoration: InputDecoration(
-                      labelText: 'From',
-                      prefixIcon: Icon(Icons.location_pin),
-                    ),
-                  ),
-                ),
-              ],
+      body: Builder(
+        builder: (BuildContext scaffoldContext) => SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height -
+                  Scaffold.of(scaffoldContext).appBarMaxHeight!,
             ),
-            if (sourcePredictions.isNotEmpty)
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                          style: TextStyle(color: Colors.white),
+
+                        controller: sourceController,
+                        onChanged: (value) {
+                          placeAutocomplete(value, true);
+                          clearPolyline();
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'From',
+                          prefixIcon: Icon(Icons.location_pin),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                iif (sourcePredictions.isNotEmpty)
               Container(
                 height: 100, // Adjust height as needed
                 color: Colors.grey[200],
@@ -354,26 +373,26 @@ class _TripPageState extends State<TripPage> {
                   },
                 ),
               ),
-            SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: destinationController,
-                    onChanged: (value) {
-                      placeAutocomplete(value, false);
-                      clearPolyline();
-                    },
-                    decoration: InputDecoration(
-                      labelText: 'To',
-                      prefixIcon: Icon(Icons.location_pin),
+                SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: destinationController,
+                        onChanged: (value) {
+                          placeAutocomplete(value, false);
+                          clearPolyline();
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'To',
+                          prefixIcon: Icon(Icons.location_pin),
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            ),
-            if (destinationPredictions.isNotEmpty)
-              Container(
+                if (destinationPredictions.isNotEmpty)
+                   Container(
                 height: 100, // Adjust height as needed
                 color: Colors.grey[200],
                 child: ListView.builder(
@@ -392,63 +411,72 @@ class _TripPageState extends State<TripPage> {
                   },
                 ),
               ),
-            VehicleDropdown(
-                vehicles: _userVehicles,
-                onVehicleSelected: _onVehicleSelected),
-            SizedBox(height: 20),
-            GestureDetector(
-              onTap: _checkGasPrice,
-              child: Container(
-                padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.blue,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.local_gas_station, color: Colors.white),
-                    SizedBox(width: 10),
-                    Text(
-                      'Check Gas Price',
-                      style: TextStyle(color: Colors.white, fontSize: 18),
+                VehicleDropdown(
+                    vehicles: _userVehicles,
+                    onVehicleSelected: _onVehicleSelected),
+                SizedBox(height: 20),
+                GestureDetector(
+                  onTap: _checkGasPrice,
+                  child: Container(
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                  ],
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.local_gas_station, color: Colors.white),
+                        SizedBox(width: 10),
+                        Text(
+                          'Check Gas Price',
+                          style: TextStyle(color: Colors.white, fontSize: 18),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (!isRoutePlotted) {
-                  fetchRouteInformation();
-                }
-              },
-              child: Text('Plot Route'),
-            ),
-            Container(
-              height: 300,
-              child: MapboxMap(
-                accessToken: "sk.eyJ1IjoianVzdGZhbCIsImEiOiJjbHBoMnFzOGYwM2o5MmlxeGM1MW5wamZoIn0.RFlNRhyj0xccr7MPoULncg",
-                initialCameraPosition: CameraPosition(
-                  target: _userLocation ?? LatLng(0.0, 0.0),
-                  zoom: 12.0,
+              
+                ElevatedButton(
+                   style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.grey[900]
+                  ),
+                  onPressed: () {
+                    if (!isRoutePlotted) {
+                      fetchRouteInformation();
+                    }
+                  },
+                  child: Text('Plot Route'),
                 ),
-                onMapCreated: (MapboxMapController controller) {
-                  _controller = controller;
-                  if (isRoutePlotted) {
-                    fetchRouteInformation();
-                  }
-                },
-              ),
+                Container(
+                  height: 300,
+                  child: MapboxMap(
+                    accessToken:
+                        "sk.eyJ1IjoianVzdGZhbCIsImEiOiJjbHBoMnFzOGYwM2o5MmlxeGM1MW5wamZoIn0.RFlNRhyj0xccr7MPoULncg",
+                    initialCameraPosition: CameraPosition(
+                      target: _userLocation ?? LatLng(0.0, 0.0),
+                      zoom: 12.0,
+                    ),
+                    onMapCreated: (MapboxMapController controller) {
+                      _controller = controller;
+                      if (isRoutePlotted) {
+                        fetchRouteInformation();
+                      }
+                    },
+                  ),
+                ),
+                TripDetailsWidget(
+                  totalDistance: _totalDistance,
+                  gasPrice: _gasPrice,
+                  vehicle: _selectedVehicle ?? null,
+                ),
+              ],
             ),
-            TripDetailsWidget(
-              totalDistance: _totalDistance,
-              gasPrice: _gasPrice,
-              vehicle: _selectedVehicle ?? null,
-            ),
-          ],
+          ),
         ),
       ),
+      backgroundColor: Colors.indigo[400],
+      drawer: SideMenu(parentContext: context),
     );
   }
 }
