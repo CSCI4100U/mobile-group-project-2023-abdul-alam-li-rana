@@ -1,13 +1,15 @@
 class Service {
+  String id;
   String vehicle;
   String serviceName;
   String carId;
-  String serviceDate; // Store date as a string
-  String serviceCost; // Store cost as a string
+  String serviceDate;
+  String serviceCost;
   String serviceDescription;
   String serviceMileage;
 
   Service({
+    this.id = ' ',
     required this.vehicle,
     required this.serviceName,
     required this.carId,
@@ -17,8 +19,9 @@ class Service {
     required this.serviceMileage,
   });
 
-  Map<String, String> toMap() {
+  Map<String, dynamic> toMap() {
     return {
+      'id':id,
       'vehicle': vehicle,
       'serviceName': serviceName,
       'carId': carId,
@@ -31,6 +34,7 @@ class Service {
 
   static Service fromMap(Map<String, dynamic> map) {
     return Service(
+      id: map['id'],
       vehicle: map['vehicle'],
       serviceName: map['serviceName']!,
       carId: map['carId']!,

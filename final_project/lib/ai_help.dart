@@ -4,6 +4,7 @@ import 'vehicle_dropdown.dart';
 import 'sidebar.dart';
 import 'dbops.dart';
 import 'help_page.dart';
+import 'api_utils.dart';
 
 class AiHelp extends StatefulWidget {
   @override
@@ -33,7 +34,7 @@ class _AiHelpState extends State<AiHelp> {
     });
   }
 
-  void _getHelp() {
+  void _getHelp() async {
     if (_selectedVehicle == null || _description.isEmpty) {
       showDialog(
         context: context,
@@ -55,12 +56,37 @@ class _AiHelpState extends State<AiHelp> {
       return;
     }
 
-    // Call your API here and update _apiResponse
-    // For now, this is just a placeholder response
-    setState(() {
-      _apiResponse = 'Response from the API based on Vehicle: ${_selectedVehicle!.make} and Description: $_description';
-    });
+    String apiResult = await getAIHelp(_description, _selectedVehicle);
+    if (apiResult == "False") {
+      // If API call fails or returns false
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Error'),
+            content: Text('AI help is not available right now.'),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      // If API call succeeds
+      setState(() {
+        _apiResponse = apiResult;
+      });
+    }
   }
+
+
+
+
 
   @override
   Widget build(BuildContext context) {

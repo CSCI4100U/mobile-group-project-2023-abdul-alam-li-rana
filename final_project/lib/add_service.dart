@@ -104,10 +104,9 @@ class _AddServiceState extends State<AddService> {
           String serviceMileage = serviceMileageController.text;
           String serviceDescription = serviceDescriptionController.text;
 
-          String id = generateVerificationCode();
           Service newService = Service(
             vehicle: vehicleFullName!,
-            carId: id,
+            carId: _selectedVehicle?.id ?? '',
             serviceName: serviceName,
             serviceDate: serviceDate,
             serviceCost: serviceCost,

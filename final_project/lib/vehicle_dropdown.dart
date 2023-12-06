@@ -20,6 +20,12 @@ class VehicleDropdown extends StatefulWidget {
 class _VehicleDropdownState extends State<VehicleDropdown> {
   Vehicle? _selectedVehicle;
 
+  void updateSelectedValue(Vehicle? selectedVehicle) {
+    setState(() {
+      _selectedVehicle = selectedVehicle;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<DropdownMenuItem<Vehicle>>>(

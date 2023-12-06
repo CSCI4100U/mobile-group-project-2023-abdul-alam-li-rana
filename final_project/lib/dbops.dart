@@ -71,12 +71,23 @@ Future<void> insertService(Service service) async {
   if (userUid != null) {
     final serviceData = service.toMap();
     serviceData['owner_uid'] = userUid;
-    await firestore.collection('services').doc(service.carId.toString()).set(serviceData);
+
+    final servicesCollection = firestore.collection('services');
+
+
+    final newServiceRef = servicesCollection.doc();
+    serviceData['id'] = newServiceRef.id;
+
+    await newServiceRef.set(serviceData);
+
+
   }
 }
 
+
 // Function to retrieve vehicles associated with the currently authenticated user
 Future<List<Service>> getService() async {
+  print("hello");
   final userUid = auth.currentUser?.uid;
   if (userUid != null) {
     QuerySnapshot querySnapshot = await firestore
@@ -85,7 +96,6 @@ Future<List<Service>> getService() async {
         .get();
 
     List<Service> result = [];
-
     for (QueryDocumentSnapshot document in querySnapshot.docs) {
       result.add(Service.fromMap(document.data() as Map<String, dynamic>));
     }
@@ -114,6 +124,34 @@ Future<void> deleteService(String id) async {
     });
   }
 }
+
+
+Future<List<Map<String, dynamic>>> loadServices(vehicle) async {
+  print("$vehicle");
+  print("attempting to find mapped services");
+  QuerySnapshot<Map<String, dynamic>> querySnapshot = await firestore
+      .collection('services')
+      .where('carId', isEqualTo: vehicle.id)
+      .get();
+
+  return querySnapshot.docs.map((doc) => doc.data()).toList();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 String generateVerificationCode() {
   // Generate a random 6-digit verification code

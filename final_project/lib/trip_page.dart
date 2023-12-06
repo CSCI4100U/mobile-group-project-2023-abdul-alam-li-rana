@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'address_complete.dart';
 import 'network_utility.dart';
-import 'gas.dart';
+import 'api_utils.dart';
 import 'package:mapbox_polyline_points/mapbox_polyline_points.dart';
 import 'sidebar.dart';
 import 'vehicle.dart';
@@ -376,6 +376,8 @@ class _TripPageState extends State<TripPage> {
                                   updateSearchBar(
                                       sourcePredictions[index].description,
                                       sourceController);
+                                  FocusScope.of(context).unfocus();
+
                                 },
                               ),
                             ),
@@ -427,6 +429,8 @@ class _TripPageState extends State<TripPage> {
                                   updateSearchBar(
                                       destinationPredictions[index].description,
                                       destinationController);
+                                  FocusScope.of(context).unfocus();
+
                                 },
                               ),
                             ),
@@ -441,14 +445,21 @@ class _TripPageState extends State<TripPage> {
                     onVehicleSelected: _onVehicleSelected,
                     dropdownColor: Colors.indigo[300]!,),
                 SizedBox(height: 20),
-                GestureDetector(
-                  onTap: _checkGasPrice,
-                  child: Container(
-                    padding: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[900],
+                ElevatedButton(
+                  onPressed: () {
+
+                    _checkGasPrice();
+                    FocusScope.of(context).unfocus();
+
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.grey[900],
+                    shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -469,6 +480,8 @@ class _TripPageState extends State<TripPage> {
                   onPressed: () {
                     if (!isRoutePlotted) {
                       fetchRouteInformation();
+                      FocusScope.of(context).unfocus();
+
                     }
                   },
                   child: Text('Plot Route'),
@@ -486,6 +499,7 @@ class _TripPageState extends State<TripPage> {
                       _controller = controller;
                       if (isRoutePlotted) {
                         fetchRouteInformation();
+
                       }
                     },
                   ),
