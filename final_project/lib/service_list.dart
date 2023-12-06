@@ -12,6 +12,7 @@ class VehicleServicesList extends StatefulWidget {
   _VehicleServicesListState createState() => _VehicleServicesListState();
 }
 
+
 class _VehicleServicesListState extends State<VehicleServicesList> {
   @override
   Widget build(BuildContext context) {
@@ -26,9 +27,7 @@ class _VehicleServicesListState extends State<VehicleServicesList> {
           return Text('No services available.');
         } else {
           List<Map<String, dynamic>> services = snapshot.data!;
-          double totalCost = services
-              .map<double>((service) => double.parse(service['cost'] ?? '0.0'))
-              .reduce((value, element) => value + element);
+          double totalCost = calculateTotalCost(services);
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -136,5 +135,16 @@ class _VehicleServicesListState extends State<VehicleServicesList> {
       },
     );
   }
+
+  double calculateTotalCost(List<Map<String, dynamic>> services) {
+    return services
+        .map<double>((service) {
+      String costString = service['serviceCost'] ?? '0.0';
+      return double.tryParse(costString) ?? 0.0;
+    })
+        .reduce((value, element) => value + element);
+  }
+
 }
+
 

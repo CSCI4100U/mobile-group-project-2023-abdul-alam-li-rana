@@ -247,7 +247,7 @@ class _ServiceHomePageState extends State<ServicePage> {
   }
 
   void _deleteService(Service service) async {
-    await deleteService(service.carId);
+    await deleteService(service.id);
     await fetchServices();
     setState(() {
       selectedService = noSelection;

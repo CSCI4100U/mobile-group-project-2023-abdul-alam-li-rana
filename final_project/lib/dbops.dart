@@ -107,14 +107,18 @@ Future<List<Service>> getService() async {
 
 // Function to update a vehicle for the currently authenticated user
 Future<void> updateService(Service service) async {
+  print("service obj?");
+  print('$service');
   final userUid = auth.currentUser?.uid;
   if (userUid != null) {
-    await firestore.collection('services').doc(service.carId.toString()).update(service.toMap());
+    await firestore.collection('services').doc(service.id).update(service.toMap());
   }
 }
 
 // Function to delete a vehicle for the currently authenticated user
 Future<void> deleteService(String id) async {
+  print("is id possibly null");
+  print(id);
   final userUid = auth.currentUser?.uid;
   if (userUid != null) {
     await firestore.collection('services').doc(id).get().then((document) {

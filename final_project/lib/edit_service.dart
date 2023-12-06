@@ -164,6 +164,7 @@ class _EditServiceState extends State<EditService> {
     String serviceDescription = serviceDescriptionController.text;
 
     Service updatedService = Service(
+      id:serviceToEdit.id,
       vehicle: vehicleFullName!,
       carId: _selectedVehicle?.id ?? "",
       serviceName: serviceName,
