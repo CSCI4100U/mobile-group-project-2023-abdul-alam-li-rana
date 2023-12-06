@@ -7,7 +7,6 @@ import 'vehicle_dropdown.dart';
 
 class EditService extends StatefulWidget {
   final Service serviceToEdit;
-
   EditService({required this.serviceToEdit});
 
   @override
@@ -16,6 +15,7 @@ class EditService extends StatefulWidget {
 }
 
 class _EditServiceState extends State<EditService> {
+
   final TextEditingController serviceNameController;
   final TextEditingController serviceDateController;
   final TextEditingController serviceCostController;
@@ -34,14 +34,32 @@ class _EditServiceState extends State<EditService> {
   @override
   void initState() {
     super.initState();
-    _loadUserVehicles(); // Load user's vehicles when the page is initialized
+     _loadUserVehicles(); // Load user's vehicles when the page is initialized
   }
 
-    Future<void> _loadUserVehicles() async {
+  Future<void> _loadUserVehicles() async {
     // Load user's vehicles when the page is initialized
     List<Vehicle> vehicles = await getVehicle();
+
+    print("User Vehicles: $vehicles");
+
+    Vehicle foundVehicle;
+    if (vehicles.isNotEmpty) {
+      foundVehicle = vehicles.firstWhere(
+            (vehicle) => vehicle.id == serviceToEdit.carId,
+        orElse: () => vehicles.first, // Default to the first vehicle if not found
+      );
+
+      print("Found Vehicle: $foundVehicle");
+    } else {
+      print("Error: No vehicles found");
+      return;
+    }
+
     setState(() {
       _userVehicles = vehicles;
+      _selectedVehicle = foundVehicle;
+      _onVehicleSelected(_selectedVehicle);
     });
   }
 
@@ -147,7 +165,7 @@ class _EditServiceState extends State<EditService> {
 
     Service updatedService = Service(
       vehicle: vehicleFullName!,
-      carId: serviceToEdit.carId,
+      carId: _selectedVehicle?.id ?? "",
       serviceName: serviceName,
       serviceDate: serviceDate,
       serviceCost: serviceCost,
