@@ -71,7 +71,7 @@ Future<void> insertService(Service service) async {
   if (userUid != null) {
     final serviceData = service.toMap();
     serviceData['owner_uid'] = userUid;
-    await firestore.collection('services').doc(service.id.toString()).set(serviceData);
+    await firestore.collection('services').doc(service.carId.toString()).set(serviceData);
   }
 }
 
@@ -99,7 +99,7 @@ Future<List<Service>> getService() async {
 Future<void> updateService(Service service) async {
   final userUid = auth.currentUser?.uid;
   if (userUid != null) {
-    await firestore.collection('services').doc(service.id.toString()).update(service.toMap());
+    await firestore.collection('services').doc(service.carId.toString()).update(service.toMap());
   }
 }
 
@@ -114,14 +114,6 @@ Future<void> deleteService(String id) async {
     });
   }
 }
-
-
-
-
-
-
-
-
 
 String generateVerificationCode() {
   // Generate a random 6-digit verification code

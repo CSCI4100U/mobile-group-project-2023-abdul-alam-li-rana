@@ -1,197 +1,331 @@
-import 'package:flutter/material.dart';
-import 'sidebar.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'oil_change_interval_page.dart'; // Import the OilChangeIntervalPage
+import 'dart:async';
+import 'package:final_project/add_service.dart';
+import 'package:final_project/dbops.dart';
+import 'package:final_project/edit_service.dart';
 
-class ServicePage extends StatelessWidget {
+import 'service.dart';
+import 'package:flutter/material.dart';
+import 'service_details_page.dart';
+import 'sidebar.dart';
+
+
+class ServicePage extends StatefulWidget {
+  @override
+  _ServiceHomePageState createState() => _ServiceHomePageState();
+}
+
+class _ServiceHomePageState extends State<ServicePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  late Service noSelection;
+  late Service selectedService;
+  late StreamController<List<dynamic>> _servicesStreamController;
+  late ServiceHoverController _hoverController;
+
+  @override
+  void initState() {
+    super.initState();
+    noSelection = Service(
+      vehicle: '',
+      serviceName: '',
+      serviceDate: '',
+      serviceCost: '',
+      serviceMileage: '',
+      serviceDescription: '',
+      carId: '',
+    );
+    selectedService = noSelection;
+    _servicesStreamController = StreamController<List<dynamic>>.broadcast();
+    _hoverController = ServiceHoverController();
+    fetchServices();
+  }
+
+    Future<void> fetchServices() async {
+    final fetchedServices = await getService();
+    _servicesStreamController.add(fetchedServices);
+  }
+  
+
+  @override
+  void dispose() {
+    _servicesStreamController.close();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.redAccent,
       key: _scaffoldKey,
       appBar: AppBar(
-        backgroundColor: Colors.red,
-        title: Text('Service Tab'),
+        centerTitle: true,
+        backgroundColor: Colors.grey[900],
+        title: Text('Service List', style: TextStyle(color: Colors.white)),
         leading: IconButton(
-          icon: Icon(Icons.menu),
+          icon: Icon(
+            Icons.menu,
+            color: Colors.white, // Set the color to white
+          ),
           onPressed: () {
             _scaffoldKey.currentState!.openDrawer();
           },
         ),
+        actions: [
+          if (selectedService.carId != '')
+            Row(
+              children: [
+                IconButton(
+                  icon: Icon(
+                    Icons.edit,
+                    color: Colors.white, // Set the color to white
+                  ),
+                  onPressed: () {
+                    _editService(selectedService);
+                  },
+                ),
+                IconButton(
+                  icon: Icon(
+                    Icons.favorite,
+                    color: Colors.white, // Set the color to white
+                  ),
+                  onPressed: () {
+                    _expandService(selectedService);
+                  },
+                ),
+              ],
+            ),
+        ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: StaggeredGridView.countBuilder(
-          crossAxisCount: 2,
-          itemCount: services.length,
-          staggeredTileBuilder: (int index) =>
-              StaggeredTile.fit(index.isEven ? 1 : 2),
-          mainAxisSpacing: 16.0,
-          crossAxisSpacing: 16.0,
-          itemBuilder: (BuildContext context, int index) {
-            if (services[index].title == 'Oil Change Interval') {
-              return _buildOilChangeButton(context, services[index]);
-            } else {
-              return _buildServiceCard(context, services[index]);
-            }
+
+      body: Container(
+        color: Colors.redAccent,
+        child: StreamBuilder<List<dynamic>>(
+          stream: _servicesStreamController.stream,
+          initialData: [],
+          builder: (context, snapshot) {
+            final List<dynamic> services = snapshot.data ?? [];
+            return (services.isEmpty
+                ? Center(child: Text('No data'))
+                : ListView.builder(
+              itemCount: services.length,
+              itemBuilder: (context, index) {
+                final service = services[index];
+                return Dismissible(
+                  key: Key(service.carId),
+                  direction: DismissDirection.endToStart,
+                  onDismissed: (direction) {
+                    _deleteService(service);
+                  },
+                  background: Container(
+                    color: Colors.red,
+                    padding: EdgeInsets.only(right: 16),
+                    alignment: Alignment.centerRight,
+                    child: Icon(
+                      Icons.delete,
+                      color: Colors.white,
+                    ),
+                  ),
+                  child: ServiceHoverRegion(
+                    service: service,
+                    hoverController: _hoverController,
+                    onTap: () {
+                      setState(() {
+                        selectedService = service;
+                      });
+                    },
+                    child: Card(
+                      elevation: 2.0,
+                      margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: selectedService.carId == service.carId
+                                ? Colors.black
+                                : Colors.transparent,
+                            width: 2.0,
+                          ),
+                        ),
+                        child: ListTile(
+                          title: Text(
+                            '${service.serviceName} (${service.vehicle})',
+                            style: TextStyle(
+                              fontSize: 22,
+                              color: _hoverController.isHovered(service)
+                                  ? Colors.blue
+                                  : Colors.black,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ));
           },
         ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          _navigateToAddService();
+        },
+        backgroundColor: Colors.grey[900], // Set your desired background color
+        foregroundColor: Colors.white, // Set text/icon color
+        icon: Icon(Icons.add),
+        label: Text('Add a Service'),
       ),
       drawer: SideMenu(parentContext: context),
     );
   }
 
-  Widget _buildServiceCard(BuildContext context, Service service) {
-    return Card(
-      elevation: 4.0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.0),
+  void _navigateToAddService() async {
+    final addedService = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddService(),
       ),
-      child: InkWell(
-        onTap: () {
-          // Handle service item click
-        },
-        borderRadius: BorderRadius.circular(16.0),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
+    );
+
+    if (addedService != null) {
+      fetchServices();
+    }
+  }
+
+  void _showOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          padding: EdgeInsets.all(16),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SvgPicture.asset(
-                service.icon,
-                height: 80.0,
-                width: 80.0,
-                color: Theme
-                    .of(context)
-                    .primaryColor,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              ListTile(
+                leading: Icon(Icons.edit),
+                title: Text('Edit'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _editService(selectedService);
+                },
               ),
-              SizedBox(height: 16.0),
-              Text(
-                service.title,
-                style: TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 8.0),
-              Text(
-                service.description,
-                style: TextStyle(
-                  fontSize: 14.0,
-                  color: Colors.grey,
-                ),
-                textAlign: TextAlign.center,
+              ListTile(
+                leading: Icon(Icons.delete),
+                title: Text('Delete'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _deleteService(selectedService);
+                },
               ),
             ],
           ),
-        ),
+        );
+      },
+    );
+  }
+
+  void _editService(Service service) async {
+    final updatedService = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditService(serviceToEdit: service),
+      ),
+    );
+
+    if (updatedService != null) {
+      fetchServices();
+      setState(() {
+        selectedService = noSelection;
+      });
+    }
+  }
+
+  void _expandService(Service service) async {
+    final updatedService = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ServiceDetails(service: service),
       ),
     );
   }
 
-  Widget _buildOilChangeButton(BuildContext context, Service service) {
-    // Assuming you have a vehicleId available, replace 'your_vehicle_id' with the actual id
-    String vehicleId = 'your_vehicle_id';
-
-    return Card(
-      elevation: 4.0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.0),
-      ),
-      child: InkWell(
-        onTap: () {
-          // Navigate to the OilChangeIntervalPage when tapped
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => OilChangeIntervalPage(vehicleId: vehicleId),
-            ),
-          );
-        },
-        borderRadius: BorderRadius.circular(16.0),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SvgPicture.asset(
-                service.icon,
-                height: 80.0,
-                width: 80.0,
-                color: Theme
-                    .of(context)
-                    .primaryColor,
-              ),
-              SizedBox(height: 16.0),
-              Text(
-                service.title,
-                style: TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 8.0),
-              Text(
-                service.description,
-                style: TextStyle(
-                  fontSize: 14.0,
-                  color: Colors.grey,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+  void _deleteService(Service service) async {
+    await deleteService(service.carId);
+    await fetchServices();
+    setState(() {
+      selectedService = noSelection;
+    });
   }
 }
 
-  class Service {
-  final String icon;
-  final String title;
-  final String description;
+class ServiceHoverController {
+  final Set<Service> _hoveredServices = {};
 
-  Service({
-    required this.icon,
-    required this.title,
-    required this.description,
+  void hover(Service service) {
+    _hoveredServices.add(service);
+  }
+
+  void unhover(Service service) {
+    _hoveredServices.remove(service);
+  }
+
+  bool isHovered(Service service) {
+    return _hoveredServices.contains(service);
+  }
+}
+
+class ServiceHoverRegion extends StatefulWidget {
+  final Service service;
+  final ServiceHoverController hoverController;
+  final VoidCallback onTap;
+  final Widget child;
+
+  ServiceHoverRegion({
+    required this.service,
+    required this.hoverController,
+    required this.onTap,
+    required this.child,
   });
+
+  @override
+  _ServiceHoverRegionState createState() => _ServiceHoverRegionState();
 }
 
-final List<Service> services = [
-  Service(
-    icon: 'assets/icons/car.svg',
-    title: 'Vehicle Maintenance',
-    description: 'Regular checkups and maintenance for your vehicles.',
-  ),
+class _ServiceHoverRegionState extends State<ServiceHoverRegion> {
+  bool isTapped = false;
 
-  Service(
-    icon: 'assets/icons/trip.svg',
-    title: 'Trip Planning',
-    description: 'Plan your trips efficiently with our trip planning services.',
-  ),
-  Service(
-    icon: 'assets/icons/service.svg',
-    title: 'Service Requests',
-    description: 'Request and schedule services for your vehicles.',
-  ),
-  Service(
-    icon: 'assets/icons/help.svg',
-    title: '24/7 Support',
-    description: 'Always here to assist you with our 24/7 customer support.',
-  ),
-
-  Service(
-    icon: 'assets/icons/oil-change.svg',
-    title: 'Oil Change Interval',
-    description: 'Track and schedule your oil change intervals.',
-  ),
-];
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        widget.onTap();
+        setState(() {
+          isTapped = true;
+        });
+        Future.delayed(Duration(milliseconds: 150), () {
+          setState(() {
+            isTapped = false;
+          });
+        });
+      },
+      child: MouseRegion(
+        onEnter: (_) {
+          widget.hoverController.hover(widget.service);
+        },
+        onExit: (_) {
+          widget.hoverController.unhover(widget.service);
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: isTapped
+                  ? Colors.blue
+                  : widget.hoverController.isHovered(widget.service)
+                  ? Colors.blue
+                  : Colors.transparent,
+              width: 2.0,
+            ),
+          ),
+          child: widget.child,
+        ),
+      ),
+    );
+  }
+}
