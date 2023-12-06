@@ -7,7 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'expanded_image.dart';
-
+import 'service_list.dart';
 class VehicleDetails extends StatefulWidget {
   final Vehicle vehicle;
 
@@ -272,6 +272,7 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                   ),
                 ],
               ),
+              VehicleServicesList(vehicle:widget.vehicle),
 
               // Expanded Image View
               if (selectedImageIndex != -1)
