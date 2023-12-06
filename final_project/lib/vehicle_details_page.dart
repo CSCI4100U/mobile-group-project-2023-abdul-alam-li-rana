@@ -42,7 +42,7 @@ class _VehicleDetailsState extends State<VehicleDetails> {
 
   Future<void> pickImageFromGallery() async {
     XFile? pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+    await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       await uploadAndSaveImage(pickedFile);
     }
@@ -50,14 +50,17 @@ class _VehicleDetailsState extends State<VehicleDetails> {
 
   Future<void> pickImageFromCamera() async {
     XFile? pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.camera);
+    await ImagePicker().pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
       await uploadAndSaveImage(pickedFile);
     }
   }
 
   Future<void> uploadAndSaveImage(XFile? image) async {
-    String uniqueFileName = DateTime.now().millisecondsSinceEpoch.toString();
+    String uniqueFileName = DateTime
+        .now()
+        .millisecondsSinceEpoch
+        .toString();
     Reference referenceRoot = FirebaseStorage.instance.ref();
     Reference referenceDirImages = referenceRoot.child('images');
     Reference referenceImageToUpload = referenceDirImages.child(uniqueFileName);
@@ -118,7 +121,10 @@ class _VehicleDetailsState extends State<VehicleDetails> {
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
+    double screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
 
     return Scaffold(
       appBar: AppBar(
@@ -139,7 +145,6 @@ class _VehicleDetailsState extends State<VehicleDetails> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               // Vehicle Data Box
-
               Container(
                 width: screenWidth,
                 padding: EdgeInsets.all(8.0),
@@ -152,28 +157,28 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                   children: <Widget>[
                     Text(
                       'Make: ${widget.vehicle.make}\n',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     Text(
                       'Model: ${widget.vehicle.model}\n',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     Text(
                       'Year: ${widget.vehicle.year}\n',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     Text(
                       'Color: ${widget.vehicle.color}\n',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     Text(
                       'VIN: ${widget.vehicle.vin}\n',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -193,18 +198,18 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                   children: <Widget>[
                     Text(
                       'Mileage (KM): ${widget.vehicle.mileage}\n',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     Text(
                       'Fuel Capacity (L): ${widget.vehicle.fuelCapacity}\n',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     Text(
                       'Fuel Economy (L/100KM): ${widget.vehicle.fuelEconomy}\n',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -212,20 +217,54 @@ class _VehicleDetailsState extends State<VehicleDetails> {
 
               SizedBox(height: 20),
 
+              Text(
+                'Pictures',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
               // Display existing images as tiles
-              // ... (ListView.builder)
+              Container(
+                height: 100,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: images.length,
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      onTap: () => toggleImageSelection(index),
+                      child: Hero(
+                        tag: 'image$index',
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                            width: 100,
+                            height: 100,
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                image: NetworkImage(images[index]),
+                                fit: BoxFit.cover,
+                              ),
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.grey[900]),
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey[900]),
                     onPressed: pickImageFromGallery,
                     icon: Icon(Icons.photo),
                     label: Text('Gallery'),
                   ),
                   ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.grey[900]),
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey[900]),
                     onPressed: pickImageFromCamera,
                     icon: Icon(Icons.camera_alt),
                     label: Text('Camera'),
@@ -238,7 +277,10 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                 Container(
                   constraints: BoxConstraints(
                     minHeight: 0,
-                    maxHeight: MediaQuery.of(context).size.height,
+                    maxHeight: MediaQuery
+                        .of(context)
+                        .size
+                        .height,
                   ),
                   child: ExpandedImageView(
                     imageUrl: images[selectedImageIndex],
