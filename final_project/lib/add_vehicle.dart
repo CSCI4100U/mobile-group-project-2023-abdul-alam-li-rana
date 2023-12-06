@@ -18,7 +18,6 @@ class _AddVehicleState extends State<AddVehicle> {
   final TextEditingController fuelCapacityController = TextEditingController();
   final TextEditingController fuelEconomyController = TextEditingController();
 
-
   String generateUniqueId() {
     String uniqueId = DateTime.now().toUtc().toIso8601String();
     return uniqueId;
@@ -29,32 +28,39 @@ class _AddVehicleState extends State<AddVehicle> {
   // Validation function for color
   bool isValidColor(String color) {
     // Customize this based on your color validation criteria
-    return color.isNotEmpty && RegExp(r'^[a-zA-Z]+$').hasMatch(color);
+    return color.isEmpty || RegExp(r'^[a-zA-Z]+$').hasMatch(color);
   }
 
-// Validation function for VIN (allowing letters and numbers)
+  // Validation function for VIN (allowing letters and numbers)
   bool isValidVIN(String vin) {
     // Customize this based on your VIN validation criteria
-    return vin.isNotEmpty && RegExp(r'^[a-zA-Z0-9]+$').hasMatch(vin);
+    return vin.isEmpty || RegExp(r'^[a-zA-Z0-9]+$').hasMatch(vin);
   }
-
 
   // Validation function for mileage (should only be numbers)
   bool isValidMileage(String mileage) {
     // Customize this based on your mileage validation criteria
-    return mileage.isNotEmpty && RegExp(r'^[0-9]+$').hasMatch(mileage);
+    return mileage.isEmpty || RegExp(r'^[0-9]+$').hasMatch(mileage);
   }
 
   // Validation function for fuel capacity (should only be numbers)
   bool isValidFuelCapacity(String fuelCapacity) {
     // Customize this based on your fuel capacity validation criteria
-    return fuelCapacity.isNotEmpty && RegExp(r'^[0-9]+$').hasMatch(fuelCapacity);
+    return fuelCapacity.isEmpty || RegExp(r'^[0-9]+$').hasMatch(fuelCapacity);
+  }
+
+  // Validation function for fuel economy (should be numbers and decimals)
+  bool isValidFuelEconomy(String fuelEconomy) {
+    // Customize this based on your fuel economy validation criteria
+    return fuelEconomy.isEmpty ||
+        double.tryParse(fuelEconomy.replaceAll(',', '')) != null;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
@@ -69,49 +75,14 @@ class _AddVehicleState extends State<AddVehicle> {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: <Widget>[
-              TextField(
-                controller: makeController,
-                decoration: InputDecoration(
-                  labelText: 'Make*',
-                ),
-              ),
-              TextField(
-                controller: modelController,
-                decoration: InputDecoration(
-                  labelText: 'Model*',
-                ),
-              ),
-              TextField(
-                controller: yearController,
-                decoration: InputDecoration(
-                  labelText: 'Year*',
-                ),
-              ),
-              TextField(
-                controller: colorController,
-                decoration: InputDecoration(labelText: 'Color'),
-              ),
-              TextField(
-                controller: vinController,
-                decoration: InputDecoration(labelText: 'VIN'),
-              ),
-              TextField(
-                controller: mileageController,
-                decoration: InputDecoration(labelText: 'Mileage (KM)'),
-              ),
-              TextField(
-                controller: fuelCapacityController,
-                decoration: InputDecoration(labelText: 'Fuel Capacity (L)'),
-              ),
-              TextField(
-                controller: fuelEconomyController,
-                decoration: InputDecoration(labelText: 'Fuel Economy(L/100km)'),
-              ),
-              if (errorMessage.isNotEmpty)
-                Text(
-                  errorMessage,
-                  style: TextStyle(color: Colors.red),
-                ),
+              _buildTextField('Make*', makeController),
+              _buildTextField('Model*', modelController),
+              _buildTextField('Year*', yearController),
+              _buildTextField('Color', colorController, validator: isValidColor),
+              _buildTextField('VIN', vinController, validator: isValidVIN),
+              _buildTextField('Mileage (KM)', mileageController, validator: isValidMileage),
+              _buildTextField('Fuel Capacity (L)', fuelCapacityController, validator: isValidFuelCapacity),
+              _buildTextField('Fuel Economy(L/100km)', fuelEconomyController, validator: isValidFuelEconomy),
             ],
           ),
         ),
@@ -127,8 +98,11 @@ class _AddVehicleState extends State<AddVehicle> {
           String fuelCapacity = fuelCapacityController.text;
           String fuelEconomy = fuelEconomyController.text;
 
-
-          if (make.isNotEmpty && model.isNotEmpty && year.isNotEmpty && isValidColor(color) && isValidVIN(vin) && isValidMileage(mileage) && isValidFuelCapacity(fuelCapacity)) {
+          if (isValidColor(color) &&
+              isValidVIN(vin) &&
+              isValidMileage(mileage) &&
+              isValidFuelCapacity(fuelCapacity) &&
+              isValidFuelEconomy(fuelEconomy)) {
             String id = generateUniqueId();
             Vehicle newVehicle = Vehicle(
               id: id,
@@ -137,11 +111,10 @@ class _AddVehicleState extends State<AddVehicle> {
               year: year,
               color: color,
               vin: vin,
-              type: 'Sedan', // You should replace 'Sedan' with the actual type selected by the user
+              type: 'Sedan', // Replace 'Sedan' with the actual type selected by the user
               mileage: mileage,
               fuelCapacity: fuelCapacity,
               fuelEconomy: fuelEconomy,
-
             );
 
             insertVehicle(newVehicle);
@@ -149,12 +122,9 @@ class _AddVehicleState extends State<AddVehicle> {
           } else {
             setState(() {
               errorMessage = 'Please fill in the required fields with valid values.';
-              // Show notification when there is an error
-              NotificationHelper.showNotification(
-                'Error',
-                'Please fill in all the required fields with valid values.',
-              );
             });
+
+            _showErrorDialog(errorMessage);
           }
         },
         backgroundColor: Colors.blue,
@@ -162,5 +132,55 @@ class _AddVehicleState extends State<AddVehicle> {
       ),
     );
   }
-}
 
+  Widget _buildTextField(String label, TextEditingController controller, {bool Function(String)? validator}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+        ),
+        onChanged: (value) {
+          if (validator != null && !validator(value)) {
+            setState(() {
+              errorMessage = 'Invalid value for $label';
+            });
+          } else {
+            setState(() {
+              errorMessage = '';
+            });
+          }
+        },
+      ),
+    );
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Error'),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(message),
+              SizedBox(height: 16.0),
+              Align(
+                alignment: Alignment.center,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text('Close'),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}

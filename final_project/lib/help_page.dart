@@ -23,6 +23,7 @@ class _HelpPageState extends State<HelpPage> {
           'FAQs',
           style: TextStyle(color: Colors.white)
           ),
+        centerTitle: true,
         leading: IconButton(
           icon: Icon(
             Icons.menu,

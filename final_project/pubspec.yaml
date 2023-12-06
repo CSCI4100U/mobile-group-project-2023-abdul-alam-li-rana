@@ -56,6 +56,7 @@ dependencies:
   mapbox_polyline_points: ^0.0.6
   google_maps_flutter: ^2.0.10
   fan_side_drawer: ^1.0.2
+  shared_preferences: ^2.0.8
 
 dev_dependencies:
   flutter_test:

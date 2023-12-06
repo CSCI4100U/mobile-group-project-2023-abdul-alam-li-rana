@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'vehicle.dart';
 import 'dbops.dart';
 
@@ -8,7 +9,8 @@ class EditVehicle extends StatefulWidget {
   EditVehicle({required this.vehicleToEdit});
 
   @override
-  _EditVehicleState createState() => _EditVehicleState(vehicleToEdit: vehicleToEdit);
+  _EditVehicleState createState() =>
+      _EditVehicleState(vehicleToEdit: vehicleToEdit);
 }
 
 class _EditVehicleState extends State<EditVehicle> {
@@ -21,7 +23,38 @@ class _EditVehicleState extends State<EditVehicle> {
   final TextEditingController fuelCapacityController;
   final TextEditingController fuelEconomyController;
 
-  String selectedType = ''; // Add this variable
+  // Validation function for color
+  bool isValidColor(String color) {
+    // Customize this based on your color validation criteria
+    return color.isEmpty || RegExp(r'^[a-zA-Z]+$').hasMatch(color);
+  }
+
+  // Validation function for VIN (allowing letters and numbers)
+  bool isValidVIN(String vin) {
+    // Customize this based on your VIN validation criteria
+    return vin.isEmpty || RegExp(r'^[a-zA-Z0-9]+$').hasMatch(vin);
+  }
+
+  // Validation function for mileage (should only be numbers)
+  bool isValidMileage(String mileage) {
+    // Customize this based on your mileage validation criteria
+    return mileage.isEmpty || RegExp(r'^[0-9]+$').hasMatch(mileage);
+  }
+
+  // Validation function for fuel capacity (should only be numbers)
+  bool isValidFuelCapacity(String fuelCapacity) {
+    // Customize this based on your fuel capacity validation criteria
+    return fuelCapacity.isEmpty || RegExp(r'^[0-9]+$').hasMatch(fuelCapacity);
+  }
+
+  // Validation function for fuel economy (should be numbers and decimals)
+  bool isValidFuelEconomy(String fuelEconomy) {
+    // Customize this based on your fuel economy validation criteria
+    return fuelEconomy.isEmpty ||
+        double.tryParse(fuelEconomy.replaceAll(',', '')) != null;
+  }
+
+  String selectedType = '';
   final Vehicle vehicleToEdit;
   String errorMessage = '';
 
@@ -32,56 +65,16 @@ class _EditVehicleState extends State<EditVehicle> {
         colorController = TextEditingController(text: vehicleToEdit.color),
         vinController = TextEditingController(text: vehicleToEdit.vin),
         mileageController = TextEditingController(text: vehicleToEdit.mileage),
-        fuelCapacityController = TextEditingController(text: vehicleToEdit.fuelCapacity),
-        fuelEconomyController = TextEditingController(text: vehicleToEdit.fuelEconomy);
-
-
-
-
-  // Placeholder implementation, customize based on your icons
-  Icon _getIconForVehicleType(String type) {
-    switch (type) {
-      case 'Sedan':
-        return Icon(Icons.directions_car);
-      case 'Van':
-        return Icon(Icons.local_shipping);
-      case 'SUV':
-        return Icon(Icons.directions_subway);
-      case 'Truck':
-        return Icon(Icons.local_shipping);
-      default:
-        return Icon(Icons.directions_car);
-    }
-  }
-
-  // Validation function for color
-  bool isValidColor(String color) {
-    // Customize this based on your color validation criteria
-    return color.isNotEmpty && RegExp(r'^[a-zA-Z]+$').hasMatch(color);
-  }
-
-// Validation function for VIN (allowing letters and numbers)
-  bool isValidVIN(String vin) {
-    // Customize this based on your VIN validation criteria
-    return vin.isNotEmpty && RegExp(r'^[a-zA-Z0-9]+$').hasMatch(vin);
-  }
-
-  // Validation function for mileage (should only be numbers)
-  bool isValidMileage(String mileage) {
-    // Customize this based on your mileage validation criteria
-    return mileage.isNotEmpty && RegExp(r'^[0-9]+$').hasMatch(mileage);
-  }
-
-  // Validation function for fuel capacity (should only be numbers)
-  bool isValidFuelCapacity(String fuelCapacity) {
-    // Customize this based on your fuel capacity validation criteria
-    return fuelCapacity.isNotEmpty && RegExp(r'^[0-9]+$').hasMatch(fuelCapacity);
-  }
+        fuelCapacityController =
+        TextEditingController(text: vehicleToEdit.fuelCapacity),
+        fuelEconomyController =
+        TextEditingController(text: vehicleToEdit.fuelEconomy);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
@@ -95,90 +88,122 @@ class _EditVehicleState extends State<EditVehicle> {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              TextField(
-                controller: makeController,
-                decoration: InputDecoration(
-                  labelText: 'Make*',
-                ),
-              ),
-              TextField(
-                controller: modelController,
-                decoration: InputDecoration(
-                  labelText: 'Model*',
-                ),
-              ),
-              TextField(
-                controller: yearController,
-                decoration: InputDecoration(
-                  labelText: 'Year*',
-                ),
-              ),
-              TextField(
-                controller: colorController,
-                decoration: InputDecoration(labelText: 'Color'),
-              ),
-              TextField(
-                controller: vinController,
-                decoration: InputDecoration(labelText: 'VIN'),
-              ),
-              TextField(
-                controller: mileageController,
-                decoration: InputDecoration(labelText: 'Mileage (KM)'),
-              ),
-              TextField(
-                controller: fuelCapacityController,
-                decoration: InputDecoration(labelText: 'Fuel Capacity (L)'),
-              ),
-              TextField(
-                controller: fuelEconomyController,
-                decoration: InputDecoration(labelText: 'Fuel Economy(L/100km)'),
-              ),
-
-              if (errorMessage.isNotEmpty)
-                Text(
-                  errorMessage,
-                  style: TextStyle(color: Colors.red),
-                ),
-
+              _buildTextField('Make*', makeController),
+              _buildTextField('Model*', modelController),
+              _buildTextField('Year*', yearController),
+              _buildTextField('Color', colorController),
+              _buildTextField('VIN', vinController),
+              _buildTextField('Mileage (KM)', mileageController),
+              _buildTextField('Fuel Capacity (L)', fuelCapacityController),
+              _buildTextField('Fuel Economy (L/100km)', fuelEconomyController),
             ],
           ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          String make = makeController.text;
-          String model = modelController.text;
-          String year = yearController.text;
-          String color = colorController.text;
-          String vin = vinController.text;
-          String mileage = mileageController.text;
-          String fuelCapacity = fuelCapacityController.text;
-          String fuelEconomy = fuelEconomyController.text;
-
-          if (make.isNotEmpty && model.isNotEmpty && year.isNotEmpty && isValidColor(color) && isValidVIN(vin) && isValidMileage(mileage) && isValidFuelCapacity(fuelCapacity)) {
-            Vehicle updatedVehicle = Vehicle(
-              id: vehicleToEdit.id,
-              make: make,
-              model: model,
-              year: year,
-              color: color,
-              vin: vin,
-              mileage: mileage,
-              fuelCapacity: fuelCapacity,
-              fuelEconomy: fuelEconomy,
-            );
-            updateVehicle(updatedVehicle);
-            Navigator.pop(context, updatedVehicle);
-          } else {
-            setState(() {
-              errorMessage = 'Please fill in the required fields with valid values.';
-            });
-          }
+          _saveChanges();
         },
         backgroundColor: Colors.blue,
         child: Icon(Icons.save),
       ),
+    );
+  }
+
+  Widget _buildTextField(String label, TextEditingController controller) {
+    // Apply input formatter only for the "Fuel Economy" field
+    List<TextInputFormatter> inputFormatters = [];
+    if (label == 'Fuel Economy (L/100km)') {
+      inputFormatters = [
+        FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*$')),
+      ];
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(),
+        ),
+        // Apply the input formatter
+        inputFormatters: inputFormatters,
+        onChanged: (value) {
+          if (label != 'Fuel Economy (L/100km)') {
+            setState(() {
+              errorMessage = '';
+            });
+          }
+        },
+      ),
+    );
+  }
+
+  void _saveChanges() {
+    String make = makeController.text;
+    String model = modelController.text;
+    String year = yearController.text;
+    String color = colorController.text;
+    String vin = vinController.text;
+    String mileage = mileageController.text;
+    String fuelCapacity = fuelCapacityController.text;
+    String fuelEconomy = fuelEconomyController.text;
+
+    if (isValidColor(color) &&
+        isValidVIN(vin) &&
+        isValidMileage(mileage) &&
+        isValidFuelCapacity(fuelCapacity) &&
+        isValidFuelEconomy(fuelEconomy)) {
+      Vehicle updatedVehicle = Vehicle(
+        id: vehicleToEdit.id,
+        make: make,
+        model: model,
+        year: year,
+        color: color,
+        vin: vin,
+        mileage: mileage,
+        fuelCapacity: fuelCapacity,
+        fuelEconomy: fuelEconomy,
+      );
+      updateVehicle(updatedVehicle);
+      Navigator.pop(context, updatedVehicle);
+    } else {
+      setState(() {
+        errorMessage = 'Please fill in the required fields with valid values.';
+      });
+
+      _showErrorDialog(errorMessage);
+    }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Error'),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(message),
+              SizedBox(height: 16.0),
+              Align(
+                alignment: Alignment.center,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text('Close'),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
