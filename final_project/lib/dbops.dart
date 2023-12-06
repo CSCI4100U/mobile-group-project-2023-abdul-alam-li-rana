@@ -6,7 +6,7 @@ import 'vehicle.dart';
 import 'dart:math';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
-
+import 'service.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -64,6 +64,61 @@ Future<void> deleteVehicle(String id) async {
     });
   }
 }
+
+
+Future<void> insertService(Service service) async {
+  final userUid = auth.currentUser?.uid;
+  if (userUid != null) {
+    final serviceData = service.toMap();
+    serviceData['owner_uid'] = userUid;
+    await firestore.collection('services').doc(service.id.toString()).set(serviceData);
+  }
+}
+
+// Function to retrieve vehicles associated with the currently authenticated user
+Future<List<Service>> getService() async {
+  final userUid = auth.currentUser?.uid;
+  if (userUid != null) {
+    QuerySnapshot querySnapshot = await firestore
+        .collection('services')
+        .where('owner_uid', isEqualTo: userUid)
+        .get();
+
+    List<Service> result = [];
+
+    for (QueryDocumentSnapshot document in querySnapshot.docs) {
+      result.add(Service.fromMap(document.data() as Map<String, dynamic>));
+    }
+    return result;
+  } else {
+    return [];
+  }
+}
+
+// Function to update a vehicle for the currently authenticated user
+Future<void> updateService(Service service) async {
+  final userUid = auth.currentUser?.uid;
+  if (userUid != null) {
+    await firestore.collection('services').doc(service.id.toString()).update(service.toMap());
+  }
+}
+
+// Function to delete a vehicle for the currently authenticated user
+Future<void> deleteService(String id) async {
+  final userUid = auth.currentUser?.uid;
+  if (userUid != null) {
+    await firestore.collection('services').doc(id).get().then((document) {
+      if (document.exists && document.data()?['owner_uid'] == userUid) {
+        firestore.collection('services').doc(id).delete();
+      }
+    });
+  }
+}
+
+
+
+
+
 
 
 

@@ -141,7 +141,8 @@ class _VehicleDetailsState extends State<VehicleDetails> {
         ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
+    child: SingleChildScrollView( // Wrap with SingleChildScrollView
+    child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               // Vehicle Data Box
@@ -274,27 +275,19 @@ class _VehicleDetailsState extends State<VehicleDetails> {
 
               // Expanded Image View
               if (selectedImageIndex != -1)
-                Container(
-                  constraints: BoxConstraints(
-                    minHeight: 0,
-                    maxHeight: MediaQuery
-                        .of(context)
-                        .size
-                        .height,
-                  ),
-                  child: ExpandedImageView(
-                    imageUrl: images[selectedImageIndex],
-                    onDelete: deleteSelectedImage,
-                    onUnexpand: () {
-                      setState(() {
-                        selectedImageIndex = -1;
-                      });
-                    },
-                  ),
+                ExpandedImageView(
+                  imageUrl: images[selectedImageIndex],
+                  onDelete: deleteSelectedImage,
+                  onUnexpand: () {
+                    setState(() {
+                      selectedImageIndex = -1;
+                    });
+                  },
                 ),
             ],
           ),
         ),
+      ),
       ),
     );
   }
