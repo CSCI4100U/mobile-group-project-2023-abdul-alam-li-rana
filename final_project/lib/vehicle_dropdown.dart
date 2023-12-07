@@ -31,9 +31,7 @@ class _VehicleDropdownState extends State<VehicleDropdown> {
     return FutureBuilder<List<DropdownMenuItem<Vehicle>>>(
       future: _buildDropdownMenuItems(),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator();
-        } else if (snapshot.hasError) {
+        if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         } else {
           return DropdownButton<Vehicle>(

@@ -63,4 +63,13 @@ class Vehicle {
   String toString() {
     return 'Vehicle{id: $id, vin: $vin, make: $make, model: $model, year: $year, color: $color, mileage: $mileage, fuelCapacity: $fuelCapacity}';
   }
+
+  bool hasEmptyParameters() {
+    return vin.isEmpty ||
+        color.isEmpty ||
+        type.isEmpty ||
+        mileage.isEmpty ||
+        fuelCapacity.isEmpty ||
+        fuelEconomy.isEmpty;
+  }
 }

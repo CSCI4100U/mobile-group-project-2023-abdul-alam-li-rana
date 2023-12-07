@@ -6,6 +6,7 @@ import 'dbops.dart';
 import 'add_vehicle.dart';
 import 'edit_vehicle.dart';
 import 'vehicle_details_page.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class VehicleHomePage extends StatefulWidget {
   @override
@@ -18,10 +19,12 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
   late Vehicle selectedVehicle;
   late StreamController<List<dynamic>> _vehiclesStreamController;
   late VehicleHoverController _hoverController;
-
+  late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+  int id = 0;
   @override
   void initState() {
     super.initState();
+    initializeNotifications();
     noSelection = Vehicle(
       id: '',
       make: '',
@@ -39,8 +42,38 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
     fetchVehicles();
   }
 
+  void initializeNotifications() async {
+    // Initialize FlutterLocalNotificationsPlugin
+    flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('mipmap/ic_launcher');
+    final InitializationSettings initializationSettings = InitializationSettings(
+      android: initializationSettingsAndroid,
+    );
+    await flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+
+    );
+  }
+
+   Future<void> _showNotification() async {
+    const AndroidNotificationDetails androidNotificationDetails = AndroidNotificationDetails(
+        'your channel id', 'your channel name',
+        channelDescription: 'your channel description',
+        importance: Importance.max,
+        priority: Priority.high,
+        ticker: 'ticker');
+    const NotificationDetails notificationDetails =
+        NotificationDetails(android: androidNotificationDetails);
+    await flutterLocalNotificationsPlugin
+        .show(id++, 'Missing Parameters!', 'Your vehicles have missing parameters! Please edit your vehicle details', notificationDetails, payload: 'item x');
+  }
+
   Future<void> fetchVehicles() async {
     final fetchedVehicles = await getVehicle();
+    if (fetchedVehicles.any((vehicle) => vehicle.hasEmptyParameters())){
+      _showNotification();
+    }
     _vehiclesStreamController.add(fetchedVehicles);
   }
 
