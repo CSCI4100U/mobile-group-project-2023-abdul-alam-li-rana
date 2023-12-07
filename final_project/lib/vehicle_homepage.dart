@@ -21,7 +21,7 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
   late VehicleHoverController _hoverController;
   late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
   int id = 0;
-  
+
   @override
   void initState() {
     super.initState();
@@ -47,31 +47,35 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
     flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('mipmap/ic_launcher');
-    final InitializationSettings initializationSettings = InitializationSettings(
+    final InitializationSettings initializationSettings =
+        InitializationSettings(
       android: initializationSettingsAndroid,
     );
     await flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
-
     );
   }
 
-   Future<void> _showNotification() async {
-    const AndroidNotificationDetails androidNotificationDetails = AndroidNotificationDetails(
-        'your channel id', 'your channel name',
-        channelDescription: 'your channel description',
-        importance: Importance.max,
-        priority: Priority.high,
-        ticker: 'ticker');
+  Future<void> _showNotification() async {
+    const AndroidNotificationDetails androidNotificationDetails =
+        AndroidNotificationDetails('your channel id', 'your channel name',
+            channelDescription: 'your channel description',
+            importance: Importance.max,
+            priority: Priority.high,
+            ticker: 'ticker');
     const NotificationDetails notificationDetails =
         NotificationDetails(android: androidNotificationDetails);
-    await flutterLocalNotificationsPlugin
-        .show(id++, 'Missing Parameters!', 'Your vehicles have missing parameters! Please edit your vehicle details', notificationDetails, payload: 'item x');
+    await flutterLocalNotificationsPlugin.show(
+        id++,
+        'Missing Parameters!',
+        'Your vehicles have missing parameters! Please edit your vehicle details',
+        notificationDetails,
+        payload: 'item x');
   }
 
   Future<void> fetchVehicles() async {
     final fetchedVehicles = await getVehicle();
-    if (fetchedVehicles.any((vehicle) => vehicle.hasEmptyParameters())){
+    if (fetchedVehicles.any((vehicle) => vehicle.hasEmptyParameters())) {
       _showNotification();
     }
     _vehiclesStreamController.add(fetchedVehicles);
@@ -126,7 +130,6 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
             ),
         ],
       ),
-
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -139,65 +142,77 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
           stream: _vehiclesStreamController.stream,
           initialData: [],
           builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              // Display a circular progress indicator while data is being fetched.
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (snapshot.hasError) {
+              // Handle the error state.
+              return Center(
+                child: Text('Error: ${snapshot.error}'),
+              );
+            }
             final List<dynamic> vehicles = snapshot.data ?? [];
             return (vehicles.isEmpty
                 ? Center(child: Text('No data'))
                 : ListView.builder(
-              itemCount: vehicles.length,
-              itemBuilder: (context, index) {
-                final vehicle = vehicles[index];
-                return Dismissible(
-                  key: Key(vehicle.id),
-                  direction: DismissDirection.endToStart,
-                  onDismissed: (direction) {
-                    _deleteVehicle(vehicle);
-                  },
-                  background: Container(
-                    color: Colors.red,
-                    padding: EdgeInsets.only(right: 16),
-                    alignment: Alignment.centerRight,
-                    child: Icon(
-                      Icons.delete,
-                      color: Colors.white,
-                    ),
-                  ),
-                  child: VehicleHoverRegion(
-                    vehicle: vehicle,
-                    hoverController: _hoverController,
-                    onTap: () {
-                      setState(() {
-                        selectedVehicle = vehicle;
-                      });
-                    },
-                    child: Card(
-                      elevation: 2.0,
-                      margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: selectedVehicle.id == vehicle.id
-                                ? Colors.black
-                                : Colors.transparent,
-                            width: 2.0,
+                    itemCount: vehicles.length,
+                    itemBuilder: (context, index) {
+                      final vehicle = vehicles[index];
+                      return Dismissible(
+                        key: Key(vehicle.id),
+                        direction: DismissDirection.endToStart,
+                        onDismissed: (direction) {
+                          _deleteVehicle(vehicle);
+                        },
+                        background: Container(
+                          color: Colors.red,
+                          padding: EdgeInsets.only(right: 16),
+                          alignment: Alignment.centerRight,
+                          child: Icon(
+                            Icons.delete,
+                            color: Colors.white,
                           ),
                         ),
-                        child: ListTile(
-                          title: Text(
-                            '${vehicle.make} ${vehicle.model} (${vehicle.year})',
-                            style: TextStyle(
-                              fontSize: 22,
-                              color: _hoverController.isHovered(vehicle)
-                                  ? Colors.blue
-                                  : Colors.black,
+                        child: VehicleHoverRegion(
+                          vehicle: vehicle,
+                          hoverController: _hoverController,
+                          onTap: () {
+                            setState(() {
+                              selectedVehicle = vehicle;
+                            });
+                          },
+                          child: Card(
+                            elevation: 2.0,
+                            margin: EdgeInsets.symmetric(
+                                horizontal: 10.0, vertical: 5.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: selectedVehicle.id == vehicle.id
+                                      ? Colors.black
+                                      : Colors.transparent,
+                                  width: 2.0,
+                                ),
+                              ),
+                              child: ListTile(
+                                title: Text(
+                                  '${vehicle.make} ${vehicle.model} (${vehicle.year})',
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    color: _hoverController.isHovered(vehicle)
+                                        ? Colors.blue
+                                        : Colors.black,
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ));
+                      );
+                    },
+                  ));
           },
         ),
       ),
@@ -356,8 +371,8 @@ class _VehicleHoverRegionState extends State<VehicleHoverRegion> {
               color: isTapped
                   ? Colors.blue
                   : widget.hoverController.isHovered(widget.vehicle)
-                  ? Colors.blue
-                  : Colors.transparent,
+                      ? Colors.blue
+                      : Colors.transparent,
               width: 2.0,
             ),
           ),

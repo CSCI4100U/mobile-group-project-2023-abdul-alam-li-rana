@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'service_details_page.dart';
 import 'sidebar.dart';
 
-
 class ServicePage extends StatefulWidget {
   @override
   _ServiceHomePageState createState() => _ServiceHomePageState();
@@ -39,11 +38,10 @@ class _ServiceHomePageState extends State<ServicePage> {
     fetchServices();
   }
 
-    Future<void> fetchServices() async {
+  Future<void> fetchServices() async {
     final fetchedServices = await getService();
     _servicesStreamController.add(fetchedServices);
   }
-  
 
   @override
   void dispose() {
@@ -94,72 +92,83 @@ class _ServiceHomePageState extends State<ServicePage> {
             ),
         ],
       ),
-
       body: Container(
         color: Colors.redAccent,
         child: StreamBuilder<List<dynamic>>(
           stream: _servicesStreamController.stream,
           initialData: [],
           builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              // Display a circular progress indicator while data is being fetched.
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (snapshot.hasError) {
+              // Handle the error state.
+              return Center(
+                child: Text('Error: ${snapshot.error}'),
+              );
+            }
             final List<dynamic> services = snapshot.data ?? [];
             return (services.isEmpty
                 ? Center(child: Text('No data'))
                 : ListView.builder(
-              itemCount: services.length,
-              itemBuilder: (context, index) {
-                final service = services[index];
-                return Dismissible(
-                  key: Key(service.carId),
-                  direction: DismissDirection.endToStart,
-                  onDismissed: (direction) {
-                    _deleteService(service);
-                  },
-                  background: Container(
-                    color: Colors.red,
-                    padding: EdgeInsets.only(right: 16),
-                    alignment: Alignment.centerRight,
-                    child: Icon(
-                      Icons.delete,
-                      color: Colors.white,
-                    ),
-                  ),
-                  child: ServiceHoverRegion(
-                    service: service,
-                    hoverController: _hoverController,
-                    onTap: () {
-                      setState(() {
-                        selectedService = service;
-                      });
-                    },
-                    child: Card(
-                      elevation: 2.0,
-                      margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: selectedService.carId == service.carId
-                                ? Colors.black
-                                : Colors.transparent,
-                            width: 2.0,
+                    itemCount: services.length,
+                    itemBuilder: (context, index) {
+                      final service = services[index];
+                      return Dismissible(
+                        key: Key(service.carId),
+                        direction: DismissDirection.endToStart,
+                        onDismissed: (direction) {
+                          _deleteService(service);
+                        },
+                        background: Container(
+                          color: Colors.red,
+                          padding: EdgeInsets.only(right: 16),
+                          alignment: Alignment.centerRight,
+                          child: Icon(
+                            Icons.delete,
+                            color: Colors.white,
                           ),
                         ),
-                        child: ListTile(
-                          title: Text(
-                            '${service.serviceName} (${service.vehicle})',
-                            style: TextStyle(
-                              fontSize: 22,
-                              color: _hoverController.isHovered(service)
-                                  ? Colors.blue
-                                  : Colors.black,
+                        child: ServiceHoverRegion(
+                          service: service,
+                          hoverController: _hoverController,
+                          onTap: () {
+                            setState(() {
+                              selectedService = service;
+                            });
+                          },
+                          child: Card(
+                            elevation: 2.0,
+                            margin: EdgeInsets.symmetric(
+                                horizontal: 10.0, vertical: 5.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: selectedService.carId == service.carId
+                                      ? Colors.black
+                                      : Colors.transparent,
+                                  width: 2.0,
+                                ),
+                              ),
+                              child: ListTile(
+                                title: Text(
+                                  '${service.serviceName} (${service.vehicle})',
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    color: _hoverController.isHovered(service)
+                                        ? Colors.blue
+                                        : Colors.black,
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ));
+                      );
+                    },
+                  ));
           },
         ),
       ),
@@ -318,8 +327,8 @@ class _ServiceHoverRegionState extends State<ServiceHoverRegion> {
               color: isTapped
                   ? Colors.blue
                   : widget.hoverController.isHovered(widget.service)
-                  ? Colors.blue
-                  : Colors.transparent,
+                      ? Colors.blue
+                      : Colors.transparent,
               width: 2.0,
             ),
           ),
