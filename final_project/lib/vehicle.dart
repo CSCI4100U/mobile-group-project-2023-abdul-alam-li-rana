@@ -6,7 +6,6 @@ class Vehicle {
   final String year;
   final String vin;
   final String color;
-  final String type;
   static const List<String> vehicleTypes = ['Sedan', 'SUV', 'Truck', 'Van', 'Motorcycle'];
   final String mileage;
   final String fuelCapacity;
@@ -20,7 +19,6 @@ class Vehicle {
     required this.year,
     this.vin = '',
     this.color = '',
-    this.type = '',
     this.mileage = '',
     this.fuelCapacity = '',
     this.fuelEconomy = ''
@@ -65,11 +63,10 @@ class Vehicle {
   }
 
   bool hasEmptyParameters() {
-    return vin.isEmpty ||
-        color.isEmpty ||
-        type.isEmpty ||
-        mileage.isEmpty ||
-        fuelCapacity.isEmpty ||
-        fuelEconomy.isEmpty;
+    if (vin.isEmpty || color.isEmpty || mileage.isEmpty || fuelCapacity.isEmpty || fuelEconomy.isEmpty){
+      return true;
+    }else{
+      return false;
+    }
   }
 }

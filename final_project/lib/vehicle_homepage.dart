@@ -21,6 +21,7 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
   late VehicleHoverController _hoverController;
   late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
   int id = 0;
+  
   @override
   void initState() {
     super.initState();
@@ -32,7 +33,6 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
       year: '',
       vin: '',
       color: '',
-      type: '',
       mileage: '',
       fuelCapacity: '',
     );

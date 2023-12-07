@@ -128,8 +128,6 @@ class _AddVehicleState extends State<AddVehicle> {
               year: year,
               color: color,
               vin: vin,
-              type:
-                  'Sedan', // Replace 'Sedan' with the actual type selected by the user
               mileage: mileage,
               fuelCapacity: fuelCapacity,
               fuelEconomy: fuelEconomy,
@@ -181,6 +179,7 @@ class _AddVehicleState extends State<AddVehicle> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Colors.green,
           title: Text('Error'),
           content: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -191,6 +190,7 @@ class _AddVehicleState extends State<AddVehicle> {
               Align(
                 alignment: Alignment.center,
                 child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
                   onPressed: () {
                     Navigator.pop(context);
                   },

@@ -66,9 +66,9 @@ class _EditVehicleState extends State<EditVehicle> {
         vinController = TextEditingController(text: vehicleToEdit.vin),
         mileageController = TextEditingController(text: vehicleToEdit.mileage),
         fuelCapacityController =
-        TextEditingController(text: vehicleToEdit.fuelCapacity),
+            TextEditingController(text: vehicleToEdit.fuelCapacity),
         fuelEconomyController =
-        TextEditingController(text: vehicleToEdit.fuelEconomy);
+            TextEditingController(text: vehicleToEdit.fuelEconomy);
 
   @override
   Widget build(BuildContext context) {
@@ -82,8 +82,10 @@ class _EditVehicleState extends State<EditVehicle> {
           },
         ),
         backgroundColor: Colors.grey[900],
-        title: Text('Edit your Vehicle',
-        style: TextStyle(color: Colors.white),),
+        title: Text(
+          'Edit your Vehicle',
+          style: TextStyle(color: Colors.white),
+        ),
       ),
       body: SizedBox(
         height: MediaQuery.of(context).size.height,
@@ -108,7 +110,8 @@ class _EditVehicleState extends State<EditVehicle> {
                   _buildTextField('VIN', vinController),
                   _buildTextField('Mileage (KM)', mileageController),
                   _buildTextField('Fuel Capacity (L)', fuelCapacityController),
-                  _buildTextField('Fuel Economy (L/100km)', fuelEconomyController),
+                  _buildTextField(
+                      'Fuel Economy (L/100km)', fuelEconomyController),
                 ],
               ),
             ),
@@ -197,6 +200,7 @@ class _EditVehicleState extends State<EditVehicle> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Colors.green,
           title: Text('Error'),
           content: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -207,6 +211,7 @@ class _EditVehicleState extends State<EditVehicle> {
               Align(
                 alignment: Alignment.center,
                 child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
                   onPressed: () {
                     Navigator.pop(context);
                   },
