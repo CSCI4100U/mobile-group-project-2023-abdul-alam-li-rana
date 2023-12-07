@@ -91,9 +91,10 @@ class _AiHelpState extends State<AiHelp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.amber,
       key: _scaffoldKey,
       appBar: AppBar(
-        backgroundColor: Color(0xFF4CAF50), // Green color for the AppBar
+        backgroundColor: Colors.grey[900], // Green color for the AppBar
         title: Text('AI Help'),
         centerTitle: true,
         leading: IconButton(
@@ -111,6 +112,7 @@ class _AiHelpState extends State<AiHelp> {
               VehicleDropdown(
                 vehicles: _userVehicles,
                 onVehicleSelected: _onVehicleSelected,
+                dropdownColor: Colors.amber[300]!,
               ),
               SizedBox(height: 20),
               TextField(
@@ -129,7 +131,7 @@ class _AiHelpState extends State<AiHelp> {
               ElevatedButton(
                 onPressed: _getHelp,
                 style: ElevatedButton.styleFrom(
-                  primary: Color(0xFF4CAF50), // Green color for the button
+                  backgroundColor: Colors.grey[900], // Green color for the button
                 ),
                 child: Text('Get Help'),
               ),
@@ -153,7 +155,7 @@ class _AiHelpState extends State<AiHelp> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Color(0xFF2E353F), // Dark gray color
+        backgroundColor: Colors.grey[900], // Dark gray color
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.grey[500],
         items: [

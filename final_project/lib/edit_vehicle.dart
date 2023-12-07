@@ -81,24 +81,37 @@ class _EditVehicleState extends State<EditVehicle> {
             Navigator.pop(context);
           },
         ),
-        backgroundColor: Colors.blue,
-        title: Text('Edit your Vehicle'),
+        backgroundColor: Colors.grey[900],
+        title: Text('Edit your Vehicle',
+        style: TextStyle(color: Colors.white),),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              _buildTextField('Make*', makeController),
-              _buildTextField('Model*', modelController),
-              _buildTextField('Year*', yearController),
-              _buildTextField('Color', colorController),
-              _buildTextField('VIN', vinController),
-              _buildTextField('Mileage (KM)', mileageController),
-              _buildTextField('Fuel Capacity (L)', fuelCapacityController),
-              _buildTextField('Fuel Economy (L/100km)', fuelEconomyController),
-            ],
+      body: SizedBox(
+        height: MediaQuery.of(context).size.height,
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Colors.green, Colors.tealAccent],
+            ),
+          ),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  _buildTextField('Make*', makeController),
+                  _buildTextField('Model*', modelController),
+                  _buildTextField('Year*', yearController),
+                  _buildTextField('Color', colorController),
+                  _buildTextField('VIN', vinController),
+                  _buildTextField('Mileage (KM)', mileageController),
+                  _buildTextField('Fuel Capacity (L)', fuelCapacityController),
+                  _buildTextField('Fuel Economy (L/100km)', fuelEconomyController),
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -106,7 +119,7 @@ class _EditVehicleState extends State<EditVehicle> {
         onPressed: () {
           _saveChanges();
         },
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.grey[900],
         child: Icon(Icons.save),
       ),
     );

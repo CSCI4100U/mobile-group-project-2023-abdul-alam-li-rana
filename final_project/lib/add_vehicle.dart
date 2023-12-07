@@ -66,23 +66,41 @@ class _AddVehicleState extends State<AddVehicle> {
             Navigator.pop(context);
           },
         ),
-        backgroundColor: Colors.blue,
-        title: Text('Register a Vehicle!'),
+        backgroundColor: Colors.grey[900],
+        title: Text('Register a Vehicle!',
+        style: TextStyle(color: Colors.white),),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: <Widget>[
-              _buildTextField('Make*', makeController),
-              _buildTextField('Model*', modelController),
-              _buildTextField('Year*', yearController),
-              _buildTextField('Color', colorController, validator: isValidColor),
-              _buildTextField('VIN', vinController, validator: isValidVIN),
-              _buildTextField('Mileage (KM)', mileageController, validator: isValidMileage),
-              _buildTextField('Fuel Capacity (L)', fuelCapacityController, validator: isValidFuelCapacity),
-              _buildTextField('Fuel Economy(L/100km)', fuelEconomyController, validator: isValidFuelEconomy),
-            ],
+      body: SizedBox(
+        height: MediaQuery.of(context).size.height,
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Colors.green, Colors.tealAccent],
+            ),
+          ),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: <Widget>[
+                  _buildTextField('Make*', makeController),
+                  _buildTextField('Model*', modelController),
+                  _buildTextField('Year*', yearController),
+                  _buildTextField('Color', colorController,
+                      validator: isValidColor),
+                  _buildTextField('VIN', vinController, validator: isValidVIN),
+                  _buildTextField('Mileage (KM)', mileageController,
+                      validator: isValidMileage),
+                  _buildTextField('Fuel Capacity (L)', fuelCapacityController,
+                      validator: isValidFuelCapacity),
+                  _buildTextField(
+                      'Fuel Economy(L/100km)', fuelEconomyController,
+                      validator: isValidFuelEconomy),
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -110,7 +128,8 @@ class _AddVehicleState extends State<AddVehicle> {
               year: year,
               color: color,
               vin: vin,
-              type: 'Sedan', // Replace 'Sedan' with the actual type selected by the user
+              type:
+                  'Sedan', // Replace 'Sedan' with the actual type selected by the user
               mileage: mileage,
               fuelCapacity: fuelCapacity,
               fuelEconomy: fuelEconomy,
@@ -120,19 +139,21 @@ class _AddVehicleState extends State<AddVehicle> {
             Navigator.pop(context, newVehicle);
           } else {
             setState(() {
-              errorMessage = 'Please fill in the required fields with valid values.';
+              errorMessage =
+                  'Please fill in the required fields with valid values.';
             });
 
             _showErrorDialog(errorMessage);
           }
         },
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.grey[900],
         child: Icon(Icons.save),
       ),
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller, {bool Function(String)? validator}) {
+  Widget _buildTextField(String label, TextEditingController controller,
+      {bool Function(String)? validator}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextField(
