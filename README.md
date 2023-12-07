@@ -61,62 +61,82 @@
   <img src="readme_images/homepage_sidebar.png" alt="Home Sidebar" width="250">
 
   - There is an avatar you can press to change your profile picture (using your camera roll or the camera itself).
-    
-    <img src="readme_images/profile_picture1.png" alt="ppic1" width="250">
-    <img src="readme_images/profile_picture2.png" alt="ppic2" width="250">
-    
   - This profile picture will be saved locally with your account.
 
 ### Homepage buttons: Vehicles
 
 - The Vehicles tab allows the user to add any of their vehicles into a list.
   
-  <img src="readme_images/vehicle_page.png" alt="vehicle" width="250">
+  <img src="readme_images/vehicle_homepage.png" alt="vehicle" width="250">
 
   - There is a menu icon in the top-left corner of the appbar; this will open a sidebar that allows navigation to other pages in the app.
     
-  <img src="readme_images/menu_sidebar.png" alt="menu" width="250">
+  <img src="readme_images/sidebar.png" alt="menu" width="250">
   
   - There are edit and delete icons in the top-right corner of the appbar for any existing vehicles.
   - Initially, the list will be empty. Press the floating action button in the bottom-right corner to add a new vehicle.
 
-#### Vehicle Edit Page:
+#### Vehicle Edit/Add Page:
 
 - This page will allow you to add any relevant details about the car you are adding (name, color, etc.)
   
-  <img src="readme_images/register_vehicle.png" alt="register" width="250">
-  <img src="readme_images/vehicle_details.png" alt="details" width="250">
+  <img src="readme_images/add_vehicle.png" alt="register" width="250">
+  <img src="readme_images/vehicle_edit.png" alt="details" width="250">
   
   - Some fields are required, while others are optional.
   - Once finished, your vehicle will be added to the Vehicles list.
+ 
+#### Vehicle Details:
+
+- This page lets you see an overview of a vehicle's details
+ <img src="readme_images/vehicle_details.png" alt="details" width="250">
+  
 
 ### Homepage buttons: Trip
 
 - This page will have a map and geolocation/geocoding functionality to plot a route for one of your vehicles. Statistics such as mileage and distance will be displayed before the trip starts.
   
-  <img src="readme_images/trip_page.png" alt="trip" width="250">   <img src="readme_images/maps_request.png" alt="request" width="250"> 
+  <img src="readme_images/trip_page.png" alt="trip" width="250"> 
 
   - There is a menu icon in the top-left corner of the appbar; this will open a sidebar that allows navigation to other pages in the app.
-  - This Trips Pages makes requests too both the Google Maps API to query addresses, and to a GAS API that will return the current average price of gas in the users location. This page fulfills the HTTP request requirements of this part of the Checkin.
-  - UNDER CONSTRUCTION
+  - This Trips Pages makes requests to both the Google Maps API to query addresses, and to a GAS API that will return the current average price of gas in the users location.
 
 ### Homepage buttons: Service
 
-- This page will display several statistics regarding the service of your vehicle and gather recommendations through an API for your personal vehicle added to the app.
+- This page will display different types of service that you have logged for your vehicles
   
-  <img src="readme_images/service_page.png" alt="service" width="250">
+  <img src="readme_images/service_homepage.png" alt="service" width="250">
+
+#### Service Edit/Add Page:
+
+- This page will allow you to add any relevant details about the service you have done on your car
   
-  - There is a menu icon in the top-left corner of the appbar; this will open a sidebar that allows navigation to other pages in the app.
-  - UNDER CONSTRUCTION
+  <img src="readme_images/add_service.png" alt="register" width="250">
+  <img src="readme_images/service_edit.png" alt="details" width="250">
+  
+  - Some fields are required, while others are optional.
+  - Once finished, your service will be added to the Services list, and will be linked/shown in the vehicle details page.
+ 
+#### Service Details:
+
+- This page lets you see an overview of a service's details
+ <img src="readme_images/service_details.png" alt="details" width="250">
 
 ### Homepage buttons: Help
 
-- This page will eventually connect with an OpenAI API where the user can ask for any help or information regarding their vehicles
+- This page lets the user view any FAQs regarding our app
   
-  <img src="readme_images/help_page.png" alt="help" width="250">
+  <img src="readme_images/faq.png" alt="help" width="250">
 
-  - There is a menu icon in the top-left corner of the appbar; this will open a sidebar that allows navigation to other pages in the app.
-  - UNDER CONSTRUCTION
+  - You can use the searchbar to search for keywords within a specific FAQ
+
+#### AI Help Page:
+
+- This page lets the user ask an AI chatbot for any vehicle related assistance
+
+  <img src="readme_images/ai.png" alt="help" width="250">
+  
+- Powered by ChatGPT
 
 ## Overview
 This group project is designed for you to demonstrate the skills that you have learned in this course.  The final project that you submit in the last week of classes will be a completed mobile application.  Non-functional requirements, especially those associated with production-readiness, will be considered extremely important when marking this project.  You are expected to work in a group of three to five students when completing this project.  Students are not permitted to work alone on the project, as this eliminates one of the learning objectives of this assessment. Peer feedback forms will be required for all three phases of the project to ensure group equity of work.
