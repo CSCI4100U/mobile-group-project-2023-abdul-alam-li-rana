@@ -33,7 +33,17 @@ class _AiHelpState extends State<AiHelp> {
       _userVehicles = vehicles;
     });
   }
-
+  void showLoadingIndicator() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
+  }
   void _getHelp() async {
     if (_selectedVehicle == null || _description.isEmpty) {
       showDialog(
@@ -56,9 +66,15 @@ class _AiHelpState extends State<AiHelp> {
       return;
     }
 
+
+    FocusScope.of(context).unfocus();
+
+    showLoadingIndicator();
     String apiResult = await getAIHelp(_description, _selectedVehicle);
+
+    Navigator.of(context, rootNavigator: true).pop();
+
     if (apiResult == "False") {
-      // If API call fails or returns false
       showDialog(
         context: context,
         builder: (BuildContext context) {

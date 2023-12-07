@@ -56,28 +56,11 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
     );
   }
 
-  Future<void> _showNotification() async {
-    const AndroidNotificationDetails androidNotificationDetails =
-        AndroidNotificationDetails('your channel id', 'your channel name',
-            channelDescription: 'your channel description',
-            importance: Importance.max,
-            priority: Priority.high,
-            ticker: 'ticker');
-    const NotificationDetails notificationDetails =
-        NotificationDetails(android: androidNotificationDetails);
-    await flutterLocalNotificationsPlugin.show(
-        id++,
-        'Missing Parameters!',
-        'Your vehicles have missing parameters! Please edit your vehicle details',
-        notificationDetails,
-        payload: 'item x');
-  }
+
 
   Future<void> fetchVehicles() async {
     final fetchedVehicles = await getVehicle();
-    if (fetchedVehicles.any((vehicle) => vehicle.hasEmptyParameters())) {
-      _showNotification();
-    }
+    
     _vehiclesStreamController.add(fetchedVehicles);
   }
 
@@ -119,7 +102,7 @@ class _VehicleHomePageState extends State<VehicleHomePage> {
                 ),
                 IconButton(
                   icon: Icon(
-                    Icons.favorite,
+                    Icons.car_crash,
                     color: Colors.white, // Set the color to white
                   ),
                   onPressed: () {
