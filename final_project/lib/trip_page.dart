@@ -72,6 +72,22 @@ class _TripPageState extends State<TripPage> {
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
   }
+  LatLngBounds computeBounds(List<LatLng> list) {
+    assert(list.isNotEmpty);
+    var firstLatLng = list.first;
+    var s = firstLatLng.latitude,
+        n = firstLatLng.latitude,
+        w = firstLatLng.longitude,
+        e = firstLatLng.longitude;
+    for (var i = 1; i < list.length; i++) {
+      var latlng = list[i];
+      s = min(s, latlng.latitude);
+      n = max(n, latlng.latitude);
+      w = min(w, latlng.longitude);
+      e = max(e, latlng.longitude);
+    }
+    return LatLngBounds(southwest: LatLng(s, w), northeast: LatLng(n, e));
+  }
 
   Future<void> fetchRouteInformation() async {
     String mapboxApiKey =
@@ -100,7 +116,21 @@ class _TripPageState extends State<TripPage> {
             LatLng(sourceLocations[0].latitude, sourceLocations[0].longitude);
         LatLng destinationLatLng = LatLng(destinationLocations[0].latitude,
             destinationLocations[0].longitude);
-        _controller?.animateCamera(CameraUpdate.newLatLng(sourceLatLng));
+        // Calculate bounding box
+        List<LatLng> boundsList = [
+          LatLng(
+            sourceLocations[0].latitude,
+            sourceLocations[0].longitude,
+          ),
+          LatLng(
+            destinationLocations[0].latitude,
+            destinationLocations[0].longitude,
+          ),
+        ];
+
+        LatLngBounds bounds = computeBounds(boundsList);
+        _controller?.animateCamera(CameraUpdate.newLatLngBounds(bounds));
+
 
         print('Source LatLng: $sourceLatLng');
         print('Destination LatLng: $destinationLatLng');
@@ -449,7 +479,6 @@ class _TripPageState extends State<TripPage> {
                   onPressed: () {
 
                     _checkGasPrice();
-                    FocusScope.of(context).unfocus();
 
                   },
                   style: ElevatedButton.styleFrom(
@@ -480,7 +509,6 @@ class _TripPageState extends State<TripPage> {
                   onPressed: () {
                     if (!isRoutePlotted) {
                       fetchRouteInformation();
-                      FocusScope.of(context).unfocus();
 
                     }
                   },
