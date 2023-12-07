@@ -1,6 +1,18 @@
-import 'package:final_project/ai_help.dart';
 import 'package:flutter/material.dart';
+import 'package:final_project/ai_help.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:http/http.dart' as http;
+import 'package:mapbox_gl/mapbox_gl.dart';
+import 'address_complete.dart';
+import 'network_utility.dart';
+import 'api_utils.dart';
+import 'package:mapbox_polyline_points/mapbox_polyline_points.dart';
 import 'sidebar.dart';
+import 'vehicle.dart';
+import 'dbops.dart';
+import 'trip_details.dart';
+import 'vehicle_dropdown.dart';
 
 class HelpPage extends StatefulWidget {
   @override
@@ -11,6 +23,39 @@ class _HelpPageState extends State<HelpPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   TextEditingController _searchController = TextEditingController();
   int _selectedIndex = 0; // Index of the selected bottom navigation bar item
+  MapboxMapController? _controller;
+  LatLng? _userLocation;
+  List<Vehicle> _userVehicles = [];
+  Vehicle? _selectedVehicle;
+  bool isRoutePlotted = false;
+  double? _totalDistance;
+  double? _gasPrice;
+  List<PointLatLng>? routePoints;
+
+
+  Future<void> _loadUserVehicles() async {
+    List<Vehicle> vehicles = await getVehicle();
+    setState(() {
+      _userVehicles = vehicles;
+    });
+  }
+
+  void _onVehicleSelected(Vehicle? selectedVehicle) {
+    setState(() {
+      _selectedVehicle = selectedVehicle;
+    });
+
+    if (_selectedVehicle != null) {
+      final snackBar = SnackBar(
+        content: Text(
+          '${_selectedVehicle!.make} ${_selectedVehicle!.model} (${_selectedVehicle!.year}) Selected.',
+        ),
+        duration: Duration(seconds: 2),
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,36 +100,36 @@ class _HelpPageState extends State<HelpPage> {
               '''Vroom Vroom is a new multipurpose vehicle management app!
               \n\nAdd your vehicles, calculate mileage for trips, and view service/maintainence tips for your vehicle.
               \n\nWelcome to Vroom Vroom!'''),
-      
+
             _buildInfoRow(context, 'How do I add vehicles?',
               '''To add vehicles, visit the vehicle page and press the "plus" button.
               \n\nThis will send you to the vehicle registration page. Enter your vehicle details and press the 'save' button to confirm your changes.
               \n\nYour vehicle is now saved!'''),
-      
+
             _buildInfoRow(context, 'How do I edit and delete vehicles?',
               '''When in the vehicle page, press the vehicle you'd like to edit/delete. Once selected, press either the 'edit' or 'trash' icons in the appbar.
               \n\nEditing will send you back to the vehicle registration page, allowing you to change any details about your vehicle.
               \n\nDeleting will delete it from our database.'''),
-      
+
             _buildInfoRow(context, 'How do I check my mileage for a trip in my vehicle?',
               '''To check your estimated mileage, head to the trip page and enter your route details (origin and destination points).
               \n\nSelect your vehicle from the vehicle page in the dropdown menu, and press the 'plot route' button.
               \n\nThe app will then display the distance of the trip, and your estimated mileage according to your vehicle details.'''),
-      
+
             _buildInfoRow(context, 'Where do I go to view any details regarding vehicle service?',
               '''All service related details will be in the service page.
               \n\nThe service page displays a multitude of information for your vehicle. Check the page regularly for perioidic tips and tricks to keep your car in optimal condition.'''),
-    
+
             _buildInfoRow(context, 'Can I ask for advice about my vehicles?',
               '''Certainly! Check out the AI help tool below to ask for advice regarding anything vehicle related!'''),
-      
+
             _buildInfoRow(context, 'How do I navigate between the pages?',
               '''Press the 'hamburger' icon in the top-left corner of the screen. This will open a sidebar allowing you to navigate between all pages in the app!'''),
-      
+
             _buildInfoRow(context, '''I can't access the trip page!''',
               '''Your location permissions may not be activated for this app. Location services are required for trip page usage.
               \n\nPlease go into your device settings and enable location services for trip page access.'''),
-      
+
             _buildInfoRow(context, '''Why can't I add my profile picture?''',
               '''Your camera roll and camera access may not be activated for this app. Profile picture functionality requires camera and photo access.
               \n\nPlease go into your device settings and enable location services for profile picture functionality.'''),
@@ -92,7 +137,7 @@ class _HelpPageState extends State<HelpPage> {
             _buildInfoRow(context, 'Why is my vehicle not being saved?',
               '''Please ensure that you have entered all mandatory details for your vehicle prior to saving.
               \n\nFields such as make, model, and year are required in order to save a vehicle.'''),
-            
+
             _buildInfoRow(context, 'The trip page is not displaying my route!',
               '''Please ensure that your source and destination addresses contain
               \n- Street Number
@@ -114,7 +159,7 @@ class _HelpPageState extends State<HelpPage> {
               '''Unfortunately, email addresses cannot be used more than once for an account. Please use a different email address if you would like to create another account.'''),
           ],
         ),
-        drawer: SideMenu(parentContext: context),
+      drawer: SideMenu(parentContext: context),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.grey[900],
         selectedItemColor: Colors.white,
@@ -146,45 +191,53 @@ class _HelpPageState extends State<HelpPage> {
     if (searchText.isEmpty || matchesSearch) {
       return Column(
         children: [
-          SingleChildScrollView(
-            child: ListTile(
-              title: Text(
-                title,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
+          Container(
+            width: MediaQuery.of(context).size.width * 0.8, // Adjust the width as needed
+            child: Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
               ),
-              onTap: () {
-                // Show a dialog with the row's details
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      backgroundColor: Colors.amber,
-                      title: Text(title),
-                      content: Text(details),
-                      actions: [
-                        ElevatedButton(
+              elevation: 5,
+              margin: EdgeInsets.symmetric(vertical: 10),
+              child: ListTile(
+                title: Center(
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+                onTap: () {
+                  // Show a dialog with the row's details
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        backgroundColor: Colors.amber,
+                        title: Center(child: Text(title)),
+                        content: Text(details),
+                        actions: [
+                          ElevatedButton(
                             onPressed: () {
                               Navigator.pop(context); // Close the dialog
                             },
                             style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.amberAccent),
+                              primary: Colors.amberAccent,
+                            ),
                             child: Text(
                               'OK',
                               style: TextStyle(color: Colors.black),
-                            )),
-                      ],
-                    );
-                  },
-                );
-              },
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+              ),
             ),
-          ),
-          Divider(
-            height: 1,
-            color: Colors.black,
           ),
         ],
       );

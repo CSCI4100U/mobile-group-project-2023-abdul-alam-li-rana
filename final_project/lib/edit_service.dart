@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'service.dart';
 import 'dbops.dart';
 import 'vehicle.dart';
@@ -15,7 +14,6 @@ class EditService extends StatefulWidget {
 }
 
 class _EditServiceState extends State<EditService> {
-
   final TextEditingController serviceNameController;
   final TextEditingController serviceDateController;
   final TextEditingController serviceCostController;
@@ -34,7 +32,7 @@ class _EditServiceState extends State<EditService> {
   @override
   void initState() {
     super.initState();
-     _loadUserVehicles(); // Load user's vehicles when the page is initialized
+    _loadUserVehicles(); // Load user's vehicles when the page is initialized
   }
 
   Future<void> _loadUserVehicles() async {
@@ -82,15 +80,15 @@ class _EditServiceState extends State<EditService> {
 
   _EditServiceState({required this.serviceToEdit})
       : serviceNameController =
-            TextEditingController(text: serviceToEdit.serviceName),
+  TextEditingController(text: serviceToEdit.serviceName),
         serviceDateController =
-            TextEditingController(text: serviceToEdit.serviceDate),
+        TextEditingController(text: serviceToEdit.serviceDate),
         serviceCostController =
-            TextEditingController(text: serviceToEdit.serviceCost),
+        TextEditingController(text: serviceToEdit.serviceCost),
         serviceMileageController =
-            TextEditingController(text: serviceToEdit.serviceMileage),
+        TextEditingController(text: serviceToEdit.serviceMileage),
         serviceDescriptionController =
-            TextEditingController(text: serviceToEdit.serviceDescription);
+        TextEditingController(text: serviceToEdit.serviceDescription);
 
   @override
   Widget build(BuildContext context) {
@@ -98,13 +96,13 @@ class _EditServiceState extends State<EditService> {
       appBar: AppBar(
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         backgroundColor: Colors.grey[900],
-        title: Text('Edit Service Details'),
+        title: Text('Edit Service Details', style: TextStyle(color: Colors.white)),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -122,7 +120,8 @@ class _EditServiceState extends State<EditService> {
               _buildTextField('Cost of Service*', serviceCostController),
               _buildTextField(
                   'Mileage at Time of Service*', serviceMileageController),
-              _buildTextField('Service Description*', serviceDescriptionController),
+              _buildTextField(
+                  'Service Description*', serviceDescriptionController),
             ],
           ),
         ),
@@ -131,8 +130,8 @@ class _EditServiceState extends State<EditService> {
         onPressed: () {
           _saveChanges();
         },
-        backgroundColor: Colors.grey[900],
-        child: Icon(Icons.save),
+        backgroundColor: Colors.grey[900], // Set grey background color for the button
+        child: Icon(Icons.save, color: Colors.white), // Set icon color to white
       ),
       backgroundColor: Colors.redAccent,
     );
@@ -145,8 +144,22 @@ class _EditServiceState extends State<EditService> {
         controller: controller,
         decoration: InputDecoration(
           labelText: label,
-          border: OutlineInputBorder(),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12.0),
+            borderSide: BorderSide(color: Colors.black), // Black border color
+          ),
+          labelStyle: TextStyle(color: Colors.white),
+          hintStyle: TextStyle(color: Colors.white),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12.0),
+            borderSide: BorderSide(color: Colors.black), // Black border color
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12.0),
+            borderSide: BorderSide(color: Colors.black), // Black border color
+          ),
         ),
+        style: TextStyle(color: Colors.white),
         onChanged: (value) {
           setState(() {
             errorMessage = '';
@@ -164,7 +177,7 @@ class _EditServiceState extends State<EditService> {
     String serviceDescription = serviceDescriptionController.text;
 
     Service updatedService = Service(
-      id:serviceToEdit.id,
+      id: serviceToEdit.id,
       vehicle: vehicleFullName!,
       carId: _selectedVehicle?.id ?? "",
       serviceName: serviceName,

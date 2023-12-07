@@ -1,8 +1,8 @@
-import 'package:final_project/service.dart';
 import 'package:flutter/material.dart';
 import 'vehicle.dart';
 import 'dbops.dart';
 import 'vehicle_dropdown.dart';
+import 'service.dart';
 
 class AddService extends StatefulWidget {
   @override
@@ -15,7 +15,7 @@ class _AddServiceState extends State<AddService> {
   final TextEditingController serviceCostController = TextEditingController();
   final TextEditingController serviceMileageController = TextEditingController();
   final TextEditingController serviceDescriptionController =
-      TextEditingController();
+  TextEditingController();
 
   Vehicle? _selectedVehicle;
   List<Vehicle> _userVehicles = [];
@@ -66,19 +66,18 @@ class _AddServiceState extends State<AddService> {
       appBar: AppBar(
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         backgroundColor: Colors.grey[900],
-        title: Text('Add Service'),
+        title: Text('Add Service', style: TextStyle(color: Colors.white)),
       ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
-                        
             children: <Widget>[
               VehicleDropdown(
                 vehicles: _userVehicles,
@@ -89,8 +88,7 @@ class _AddServiceState extends State<AddService> {
               _buildTextField('Date of Service*', serviceDateController),
               _buildTextField('Cost of Service*', serviceCostController),
               _buildTextField('Mileage at Time of Service*', serviceMileageController),
-              _buildTextField(
-                  'Service Description*', serviceDescriptionController),
+              _buildTextField('Service Description*', serviceDescriptionController),
             ],
           ),
         ),
@@ -110,35 +108,43 @@ class _AddServiceState extends State<AddService> {
             serviceDate: serviceDate,
             serviceCost: serviceCost,
             serviceDescription: serviceDescription,
-            serviceMileage: serviceMileage,      
+            serviceMileage: serviceMileage,
           );
 
-          insertService(newService); 
+          insertService(newService);
           Navigator.pop(context, newService);
-
         },
-        backgroundColor: Colors.grey[900],
-        child: Icon(Icons.save),
+        backgroundColor: Colors.grey[900], // Set red accent color for the button
+        child: Icon(Icons.save, color: Colors.white), // Set icon color to white
       ),
       backgroundColor: Colors.redAccent,
     );
   }
 
   Widget _buildTextField(String label, TextEditingController controller,
-      {bool Function(String)? validator}) {
+      {int maxLines = 1}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextField(
+        style: TextStyle(color: Colors.white), // Set text color to white
         controller: controller,
+        maxLines: maxLines,
         decoration: InputDecoration(
           labelText: label,
+          hintText: 'Enter $label',
+          hintStyle: TextStyle(color: Colors.white54), // Set hint text color
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10.0), // Set border radius
+            borderSide: BorderSide(color: Colors.black), // Set border color
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10.0),
+            borderSide: BorderSide(color: Colors.black), // Set focused border color
+          ),
+          labelStyle: TextStyle(color: Colors.white), // Set label text color
         ),
         onChanged: (value) {
-          if (validator != null && !validator(value)) {
-            setState(() {
-              errorMessage = 'Invalid value for $label';
-            });
-          } else {
+          if (value.isNotEmpty) {
             setState(() {
               errorMessage = '';
             });

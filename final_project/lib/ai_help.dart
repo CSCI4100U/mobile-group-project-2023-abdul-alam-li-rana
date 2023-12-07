@@ -86,15 +86,12 @@ class _AiHelpState extends State<AiHelp> {
 
 
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.amber,
       key: _scaffoldKey,
       appBar: AppBar(
-        backgroundColor: Colors.grey[900], // Green color for the AppBar
+        backgroundColor: Colors.amber,
         title: Text('AI Help'),
         centerTitle: true,
         leading: IconButton(
@@ -103,44 +100,51 @@ class _AiHelpState extends State<AiHelp> {
         ),
       ),
       drawer: SideMenu(parentContext: context),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
-        child: Container(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              VehicleDropdown(
-                vehicles: _userVehicles,
-                onVehicleSelected: _onVehicleSelected,
-                dropdownColor: Colors.amber[300]!,
-              ),
-              SizedBox(height: 20),
-              TextField(
-                controller: _descriptionController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Describe your problem',
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            VehicleDropdown(
+              vehicles: _userVehicles,
+              onVehicleSelected: _onVehicleSelected,
+            ),
+            SizedBox(height: 20),
+            TextField(
+              controller: _descriptionController,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
                 ),
-                maxLength: 500,
-                maxLines: null,
-                onChanged: (value) {
-                  _description = value;
-                },
+                labelText: 'Describe your problem',
               ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _getHelp,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey[900], // Green color for the button
+              maxLength: 500,
+              maxLines: null,
+              onChanged: (value) {
+                _description = value;
+              },
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _getHelp,
+              style: ElevatedButton.styleFrom(
+                primary: Colors.amber,
+                padding: EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
                 ),
-                child: Text('Get Help'),
               ),
-              SizedBox(height: 20),
-              Container(
-                height: 100,
+              child: Text(
+                'Get Help',
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
+            SizedBox(height: 20),
+            Expanded(
+              child: Container(
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.black),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(10.0),
                 ),
                 padding: EdgeInsets.all(8.0),
                 child: SingleChildScrollView(
@@ -150,12 +154,12 @@ class _AiHelpState extends State<AiHelp> {
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.grey[900], // Dark gray color
+        backgroundColor: Colors.grey[800],
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.grey[500],
         items: [
@@ -174,11 +178,9 @@ class _AiHelpState extends State<AiHelp> {
     );
   }
 
-
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-      // Navigate to another page for the first option
       if (_selectedIndex == 0) {
         Navigator.pushReplacement(
           context,
