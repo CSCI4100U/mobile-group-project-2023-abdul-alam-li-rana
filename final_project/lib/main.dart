@@ -8,13 +8,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'MainPages/home_page.dart';
 import 'MainPages/login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-<<<<<<< HEAD
 import 'MainPages/verification_screen.dart';
-=======
-import 'verification_screen.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'dbops.dart';
+
 
 void main() async {
   
