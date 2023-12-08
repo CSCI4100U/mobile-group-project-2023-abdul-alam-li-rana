@@ -37,7 +37,7 @@ void main() async {
   Workmanager().registerPeriodicTask(
     "2",
     "simplePeriodicTask",
-    frequency: Duration(minutes: 15),
+    frequency: Duration(days: 1),
   );
 
 
@@ -92,7 +92,6 @@ class MyApp extends StatelessWidget {
           if (user.emailVerified) {
             return HomePage();
           } else {
-            // Check if the user signed out, and show the login form accordingly.
             return EmailVerificationScreen();
           }
         } else {
