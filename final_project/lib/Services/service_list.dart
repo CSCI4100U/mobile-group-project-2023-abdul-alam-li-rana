@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'vehicle.dart';
-import 'dbops.dart';
-import 'edit_service.dart';
+import 'package:final_project/Vehicles/vehicle.dart';
+import '../Functionality/dbops.dart';
+import 'package:final_project/Services/edit_service.dart';
 import 'service.dart';
 class VehicleServicesList extends StatefulWidget {
   final Vehicle vehicle;

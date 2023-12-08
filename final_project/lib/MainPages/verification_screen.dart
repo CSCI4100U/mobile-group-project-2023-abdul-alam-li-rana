@@ -1,9 +1,9 @@
 import 'dart:async';
-import 'package:final_project/dbops.dart';
+import 'package:final_project/Functionality/dbops.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'main.dart';
+import '../main.dart';
 import 'login.dart';
 
 class EmailVerificationScreen extends StatefulWidget {

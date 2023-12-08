@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'service.dart';
-import 'dbops.dart';
-import 'vehicle.dart';
-import 'vehicle_dropdown.dart';
+import 'package:final_project/Services/service.dart';
+import 'package:final_project/Functionality/dbops.dart';
+import 'package:final_project/Vehicles/vehicle.dart';
+import 'package:final_project/Vehicles/vehicle_dropdown.dart';
 
 class EditService extends StatefulWidget {
   final Service serviceToEdit;
@@ -146,20 +146,20 @@ class _EditServiceState extends State<EditService> {
           labelText: label,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.0),
-            borderSide: BorderSide(color: Colors.black), // Black border color
+            borderSide: BorderSide(color: Colors.black),
           ),
-          labelStyle: TextStyle(color: Colors.white),
-          hintStyle: TextStyle(color: Colors.white),
+          labelStyle: TextStyle(color: Colors.black), // Set label color to black
+          hintStyle: TextStyle(color: Colors.black), // Set hint color to black
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.0),
-            borderSide: BorderSide(color: Colors.black), // Black border color
+            borderSide: BorderSide(color: Colors.black),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.0),
-            borderSide: BorderSide(color: Colors.black), // Black border color
+            borderSide: BorderSide(color: Colors.black),
           ),
         ),
-        style: TextStyle(color: Colors.white),
+        style: TextStyle(color: Colors.black), // Set text color to black
         onChanged: (value) {
           setState(() {
             errorMessage = '';
@@ -168,25 +168,61 @@ class _EditServiceState extends State<EditService> {
       ),
     );
   }
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Error'),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(message),
+              SizedBox(height: 16.0),
+              Align(
+                alignment: Alignment.center,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text('Close'),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   void _saveChanges() {
-    String serviceName = serviceNameController.text;
-    String serviceDate = serviceDateController.text;
-    String serviceCost = serviceCostController.text;
-    String serviceMileage = serviceMileageController.text;
-    String serviceDescription = serviceDescriptionController.text;
+    String serviceName = serviceNameController.text.trim();
+    String serviceDate = serviceDateController.text.trim();
+    String serviceCost = serviceCostController.text.trim();
+    String serviceMileage = serviceMileageController.text.trim();
+    String serviceDescription = serviceDescriptionController.text.trim();
 
-    Service updatedService = Service(
-      id: serviceToEdit.id,
-      vehicle: vehicleFullName!,
-      carId: _selectedVehicle?.id ?? "",
-      serviceName: serviceName,
-      serviceDate: serviceDate,
-      serviceCost: serviceCost,
-      serviceDescription: serviceDescription,
-      serviceMileage: serviceMileage,
-    );
-    updateService(updatedService);
-    Navigator.pop(context, updatedService);
+    if (serviceName.isEmpty ||
+        serviceDate.isEmpty ||
+        serviceCost.isEmpty ||
+        serviceMileage.isEmpty ||
+        serviceDescription.isEmpty) {
+      _showErrorDialog('Please enter all required fields.');
+    } else {
+      Service updatedService = Service(
+        id: serviceToEdit.id,
+        vehicle: vehicleFullName!,
+        carId: _selectedVehicle?.id ?? "",
+        serviceName: serviceName,
+        serviceDate: serviceDate,
+        serviceCost: serviceCost,
+        serviceDescription: serviceDescription,
+        serviceMileage: serviceMileage,
+      );
+      updateService(updatedService);
+      Navigator.pop(context, updatedService);
+    }
   }
+
 }

@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:final_project/ai_help.dart';
+import 'package:final_project/AI/ai_help.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
 import 'package:mapbox_gl/mapbox_gl.dart';
-import 'address_complete.dart';
-import 'network_utility.dart';
-import 'api_utils.dart';
+import '../Functionality/address_complete.dart';
+import '../Functionality/network_utility.dart';
+import '../Functionality/api_utils.dart';
 import 'package:mapbox_polyline_points/mapbox_polyline_points.dart';
-import 'sidebar.dart';
-import 'vehicle.dart';
-import 'dbops.dart';
-import 'trip_details.dart';
-import 'vehicle_dropdown.dart';
+import '../MainPages/sidebar.dart';
+import 'package:final_project/Vehicles/vehicle.dart';
+import '../Functionality/dbops.dart';
+import 'package:final_project/Trip/trip_details.dart';
+import 'package:final_project/Vehicles/vehicle_dropdown.dart';
 
 class HelpPage extends StatefulWidget {
   @override

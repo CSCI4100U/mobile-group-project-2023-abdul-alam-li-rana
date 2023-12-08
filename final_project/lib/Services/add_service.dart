@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'vehicle.dart';
-import 'dbops.dart';
-import 'vehicle_dropdown.dart';
+import 'package:final_project/Vehicles/vehicle.dart';
+import 'package:final_project/Functionality/dbops.dart';
+import 'package:final_project/Vehicles/vehicle_dropdown.dart';
 import 'service.dart';
 
 class AddService extends StatefulWidget {
@@ -88,71 +88,89 @@ class _AddServiceState extends State<AddService> {
               _buildTextField('Date of Service*', serviceDateController),
               _buildTextField('Cost of Service*', serviceCostController),
               _buildTextField('Mileage at Time of Service*', serviceMileageController),
-              _buildTextField('Service Description*', serviceDescriptionController),
+              _buildTextField('Service Description*', serviceDescriptionController, isRequired: false),
             ],
           ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          String serviceName = serviceNameController.text;
-          String serviceDate = serviceDateController.text;
-          String serviceCost = serviceCostController.text;
-          String serviceMileage = serviceMileageController.text;
-          String serviceDescription = serviceDescriptionController.text;
+          String serviceName = serviceNameController.text.trim();
+          String serviceDate = serviceDateController.text.trim();
+          String serviceCost = serviceCostController.text.trim();
+          String serviceMileage = serviceMileageController.text.trim();
+          String serviceDescription = serviceDescriptionController.text.trim();
 
-          Service newService = Service(
-            vehicle: vehicleFullName!,
-            carId: _selectedVehicle?.id ?? '',
-            serviceName: serviceName,
-            serviceDate: serviceDate,
-            serviceCost: serviceCost,
-            serviceDescription: serviceDescription,
-            serviceMileage: serviceMileage,
-          );
+          if (serviceName.isEmpty ||
+              serviceDate.isEmpty ||
+              serviceCost.isEmpty ||
+              serviceMileage.isEmpty ||
+              serviceDescription.isEmpty) {
+            _showErrorDialog('Please enter all required fields.');
+          } else {
+            Service newService = Service(
+              vehicle: vehicleFullName!,
+              carId: _selectedVehicle?.id ?? '',
+              serviceName: serviceName,
+              serviceDate: serviceDate,
+              serviceCost: serviceCost,
+              serviceDescription: serviceDescription,
+              serviceMileage: serviceMileage,
+            );
 
-          insertService(newService);
-          Navigator.pop(context, newService);
+            insertService(newService);
+            Navigator.pop(context, newService);
+          }
         },
-        backgroundColor: Colors.grey[900], // Set red accent color for the button
+
+        backgroundColor: Colors.grey[900],
         child: Icon(Icons.save, color: Colors.white), // Set icon color to white
       ),
       backgroundColor: Colors.redAccent,
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller,
-      {int maxLines = 1}) {
+  Widget _buildTextField(
+      String label,
+      TextEditingController controller, {
+        bool isRequired = true,
+        int maxLines = 1,
+      }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextField(
-        style: TextStyle(color: Colors.white), // Set text color to white
+        style: TextStyle(color: Colors.grey[900]), // Set text color to grey 900
         controller: controller,
         maxLines: maxLines,
         decoration: InputDecoration(
           labelText: label,
           hintText: 'Enter $label',
-          hintStyle: TextStyle(color: Colors.white54), // Set hint text color
+          hintStyle: TextStyle(color: Colors.grey[900]),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10.0), // Set border radius
-            borderSide: BorderSide(color: Colors.black), // Set border color
+            borderRadius: BorderRadius.circular(10.0),
+            borderSide: BorderSide(color: Colors.black),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10.0),
-            borderSide: BorderSide(color: Colors.black), // Set focused border color
+            borderSide: BorderSide(color: Colors.black),
           ),
-          labelStyle: TextStyle(color: Colors.white), // Set label text color
+          labelStyle: TextStyle(color: Colors.grey[900]), // Set label color to grey 900
+          errorText: isRequired && controller.text.trim().isEmpty
+              ? '$label is required'
+              : null,
         ),
         onChanged: (value) {
-          if (value.isNotEmpty) {
-            setState(() {
-              errorMessage = '';
-            });
-          }
+          setState(() {
+            errorMessage = '';
+          });
         },
       ),
     );
   }
+
+
+
+
 
   void _showErrorDialog(String message) {
     showDialog(

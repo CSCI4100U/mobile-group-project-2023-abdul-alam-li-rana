@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
-import 'package:final_project/account.dart';
-import 'package:final_project/db_utils.dart';
+import 'package:final_project/Functionality/account.dart';
+import 'package:final_project/Functionality/db_utils.dart';
 import 'package:sqflite/sqflite.dart';
 
 class AccountModel {
