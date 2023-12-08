@@ -14,6 +14,8 @@ import 'package:final_project/Vehicles/vehicle.dart';
 import '../Functionality/dbops.dart';
 import 'package:final_project/Trip/trip_details.dart';
 import 'package:final_project/Vehicles/vehicle_dropdown.dart';
+import 'dart:convert';
+import 'dart:math';
 
 class TripPage extends StatefulWidget {
   @override
@@ -33,7 +35,7 @@ class _TripPageState extends State<TripPage> {
 
   MapboxMapController? _controller;
   String? routeGeometry;
-  LatLng? _userLocation;
+  LatLng? _userLocation; 
   bool isRoutePlotted = false;
   double? _totalDistance;
   double? _gasPrice;
@@ -46,8 +48,7 @@ class _TripPageState extends State<TripPage> {
   void initState() {
     super.initState();
     _getCurrentLocation();
-    _loadUserVehicles();
-  }
+    _loadUserVehicles(); 
 
   Future<void> _loadUserVehicles() async {
     List<Vehicle> vehicles = await getVehicle();
@@ -64,14 +65,36 @@ class _TripPageState extends State<TripPage> {
     if (_selectedVehicle != null) {
       final snackBar = SnackBar(
         content: Text(
-          '${_selectedVehicle!.make} ${_selectedVehicle!.model} (${_selectedVehicle!.year}) Selected.',
-        ),
+            '${_selectedVehicle!.make} ${_selectedVehicle!.model} (${_selectedVehicle!.year}) Selected.'),
         duration: Duration(seconds: 2),
       );
 
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
   }
+ LatLngBounds computeBounds(List<LatLng> list, {double expansionFactor = 1.2}) {
+  assert(list.isNotEmpty);
+  var firstLatLng = list.first;
+  var s = firstLatLng.latitude,
+      n = firstLatLng.latitude,
+      w = firstLatLng.longitude,
+      e = firstLatLng.longitude;
+  for (var i = 1; i < list.length; i++) {
+    var latlng = list[i];
+    s = min(s, latlng.latitude);
+    n = max(n, latlng.latitude);
+    w = min(w, latlng.longitude);
+    e = max(e, latlng.longitude);
+  }
+
+  var latSpan = (n - s) * (expansionFactor - 1.0) / 2.0;
+  var lngSpan = (e - w) * (expansionFactor - 1.0) / 2.0;
+
+  return LatLngBounds(
+    southwest: LatLng(s - latSpan, w - lngSpan),
+    northeast: LatLng(n + latSpan, e + lngSpan),
+  );
+}
 
   Future<void> fetchRouteInformation() async {
     String mapboxApiKey =
@@ -90,24 +113,38 @@ class _TripPageState extends State<TripPage> {
     try {
       List<Location> sourceLocations = await locationFromAddress(sourceAddress);
       List<Location> destinationLocations =
-      await locationFromAddress(destinationAddress);
+          await locationFromAddress(destinationAddress);
 
       print('Source Locations: $sourceLocations');
       print('Destination Locations: $destinationLocations');
 
       if (sourceLocations.isNotEmpty && destinationLocations.isNotEmpty) {
         LatLng sourceLatLng =
-        LatLng(sourceLocations[0].latitude, sourceLocations[0].longitude);
+            LatLng(sourceLocations[0].latitude, sourceLocations[0].longitude);
         LatLng destinationLatLng = LatLng(destinationLocations[0].latitude,
             destinationLocations[0].longitude);
-        _controller?.animateCamera(CameraUpdate.newLatLng(sourceLatLng));
+        // Calculate bounding box
+        List<LatLng> boundsList = [
+          LatLng(
+            sourceLocations[0].latitude,
+            sourceLocations[0].longitude,
+          ),
+          LatLng(
+            destinationLocations[0].latitude,
+            destinationLocations[0].longitude,
+          ),
+        ];
+
+        LatLngBounds bounds = computeBounds(boundsList);
+        _controller?.animateCamera(CameraUpdate.newLatLngBounds(bounds));
+
 
         print('Source LatLng: $sourceLatLng');
         print('Destination LatLng: $destinationLatLng');
 
         MapboxpolylinePoints mapboxPolylinePoints = MapboxpolylinePoints();
         MapboxPolylineResult result =
-        await mapboxPolylinePoints.getRouteBetweenCoordinates(
+            await mapboxPolylinePoints.getRouteBetweenCoordinates(
           mapboxApiKey,
           PointLatLng(
               latitude: sourceLatLng.latitude,
@@ -194,7 +231,7 @@ class _TripPageState extends State<TripPage> {
 
     if (response != null) {
       PlaceAutocompleteResponse result =
-      PlaceAutocompleteResponse.parseAutocompleteResult(response);
+          PlaceAutocompleteResponse.parseAutocompleteResult(response);
       if (result.predictions != null) {
         setState(() {
           if (isSource) {
@@ -257,7 +294,7 @@ class _TripPageState extends State<TripPage> {
   Future<void> _checkGasPrice() async {
     try {
       String? gasPriceString =
-      await getGasPrice(); // Assuming getGasPrice() returns a Future<String>
+          await getGasPrice(); // Assuming getGasPrice() returns a Future<String>
 
       double? gasPrice;
 
@@ -274,7 +311,7 @@ class _TripPageState extends State<TripPage> {
 
       setState(() {
         _gasPrice =
-            gasPrice ?? 2.50; // Use the parsed gas price or default to $2.50
+            gasPrice ?? 1.52; // Use the parsed gas price or default to $2.50
         print(_gasPrice);
       });
     } catch (error) {
@@ -336,76 +373,178 @@ class _TripPageState extends State<TripPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                StyledInputBox(
-                  controller: sourceController,
-                  hintText: 'From',
-                  icon: Icons.location_pin,
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        style: TextStyle(color: Colors.white),
+                        controller: sourceController,
+                        onChanged: (value) {
+                          placeAutocomplete(value, true);
+                          clearPolyline();
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'From',
+                          prefixIcon: Icon(Icons.location_pin),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-
                 if (sourcePredictions.isNotEmpty)
-                  StyledPredictionsList(
-                    predictions: sourcePredictions,
-                    onTap: (selectedLocation) {
-                      updateSearchBar(selectedLocation, sourceController);
-                      FocusScope.of(context).unfocus();
-                    },
+                  Container(
+                    height: 100, // Adjust height as needed
+                    color: Colors.transparent,
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: sourcePredictions.length,
+                      itemBuilder: (context, index) {
+                        return Column(
+                          children: [
+                            Container(
+                              margin: EdgeInsets.symmetric(vertical: 5.0),
+                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(10.0),
+                              color: Colors.indigo[300]),
+                              child: ListTile(
+                                title: Text(
+                                    sourcePredictions[index].description ?? '',
+                                    style: TextStyle(color: Colors.white)),
+                                onTap: () {
+                                  updateSearchBar(
+                                      sourcePredictions[index].description,
+                                      sourceController);
+                                  FocusScope.of(context).unfocus();
+
+                                },
+                              ),
+                            ),
+                            Divider(height: 1, color: Colors.black,)
+                          ],
+                        );
+                      },
+                    ),
                   ),
-
                 SizedBox(height: 20),
-
-                StyledInputBox(
-                  controller: destinationController,
-                  hintText: 'To',
-                  icon: Icons.location_pin,
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        style: TextStyle(color: Colors.white),
+                        controller: destinationController,
+                        onChanged: (value) {
+                          placeAutocomplete(value, false);
+                          clearPolyline();
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'To',
+                          prefixIcon: Icon(Icons.location_pin),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-
                 if (destinationPredictions.isNotEmpty)
-                  StyledPredictionsList(
-                    predictions: destinationPredictions,
-                    onTap: (selectedLocation) {
-                      updateSearchBar(selectedLocation, destinationController);
-                      FocusScope.of(context).unfocus();
-                    },
+                  Container(
+                    height: 100, // Adjust height as needed
+                    color: Colors.transparent,
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: destinationPredictions.length,
+                      itemBuilder: (context, index) {
+                        return Column(
+                          children: [
+                            Container(
+                              margin: EdgeInsets.symmetric(vertical: 5.0),
+                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(10.0),
+                              color: Colors.indigo[300]),
+                              child: ListTile(
+                                title: Text(
+                                  destinationPredictions[index].description ?? '',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                onTap: () {
+                                  updateSearchBar(
+                                      destinationPredictions[index].description,
+                                      destinationController);
+                                  FocusScope.of(context).unfocus();
+
+                                },
+                              ),
+                            ),
+                            Divider(height: 1, color: Colors.black,)
+                          ],
+                        );
+                      },
+                    ),
                   ),
-
                 VehicleDropdown(
-                  vehicles: _userVehicles,
-                  onVehicleSelected: _onVehicleSelected,
-                  dropdownColor: Colors.indigo[300]!,
-                ),
-
+                    vehicles: _userVehicles,
+                    onVehicleSelected: _onVehicleSelected,
+                    dropdownColor: Colors.indigo[300]!,),
                 SizedBox(height: 20),
-
-                StyledButton(
+                ElevatedButton(
                   onPressed: () {
+
                     _checkGasPrice();
-                    FocusScope.of(context).unfocus();
-                  },
-                  label: 'Check Gas Price',
-                  icon: Icons.local_gas_station,  // Provide the icon parameter here
-                  buttonColor: Colors.indigo[600]!,
-                  labelColor: Colors.white,
-                ),
 
-                StyledButton(
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.grey[900],
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.local_gas_station, color: Colors.white),
+                        SizedBox(width: 10),
+                        Text(
+                          'Check Gas Price',
+                          style: TextStyle(color: Colors.white, fontSize: 18),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                ElevatedButton(
                   onPressed: () {
+
                     if (!isRoutePlotted) {
                       fetchRouteInformation();
-                      FocusScope.of(context).unfocus();
+
                     }
+
                   },
-                  label: 'Plot Route',
-                  icon: Icons.not_interested,  // Empty or placeholder icon
-                  buttonColor: Colors.indigo[600]!,
-                  labelColor: Colors.white,
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.grey[900],
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.card_travel, color: Colors.white),
+                        SizedBox(width: 10),
+                        Text(
+                          'Plot Route',
+                          style: TextStyle(color: Colors.white, fontSize: 18),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-
-
+                
                 Container(
                   height: 300,
                   child: MapboxMap(
                     accessToken:
-                    "sk.eyJ1IjoianVzdGZhbCIsImEiOiJjbHBoMnFzOGYwM2o5MmlxeGM1MW5wamZoIn0.RFlNRhyj0xccr7MPoULncg",
+                        "sk.eyJ1IjoianVzdGZhbCIsImEiOiJjbHBoMnFzOGYwM2o5MmlxeGM1MW5wamZoIn0.RFlNRhyj0xccr7MPoULncg",
                     initialCameraPosition: CameraPosition(
                       target: _userLocation ?? LatLng(0.0, 0.0),
                       zoom: 12.0,
@@ -414,11 +553,11 @@ class _TripPageState extends State<TripPage> {
                       _controller = controller;
                       if (isRoutePlotted) {
                         fetchRouteInformation();
+
                       }
                     },
                   ),
                 ),
-
                 TripDetailsWidget(
                   totalDistance: _totalDistance,
                   gasPrice: _gasPrice,
@@ -434,115 +573,3 @@ class _TripPageState extends State<TripPage> {
     );
   }
 }
-
-class StyledInputBox extends StatelessWidget {
-  final TextEditingController controller;
-  final String hintText;
-  final IconData icon;
-
-  const StyledInputBox({
-    required this.controller,
-    required this.hintText,
-    required this.icon,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 10),
-      child: TextField(
-        style: TextStyle(color: Colors.white),
-        controller: controller,
-        onChanged: (value) {
-          // Your existing onChanged logic
-        },
-        decoration: InputDecoration(
-          labelText: hintText,
-          prefixIcon: Icon(icon, color: Colors.indigo[300]),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(color: Colors.indigo[300]!),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(color: Colors.indigo[300]!),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class StyledPredictionsList extends StatelessWidget {
-  final List<AutocompletePrediction> predictions;
-  final Function(String?) onTap;
-
-  const StyledPredictionsList({
-    required this.predictions,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 100,
-      child: ListView.builder(
-        itemCount: predictions.length,
-        itemBuilder: (context, index) {
-          final prediction = predictions[index];
-          return ListTile(
-            title: Text(prediction.description ?? ""),
-            onTap: () {
-              onTap(prediction.description);
-            },
-          );
-        },
-      ),
-    );
-  }
-}
-
-class StyledButton extends StatelessWidget {
-  final VoidCallback onPressed;
-  final String label;
-  final IconData icon;  // Add this line
-  final Color buttonColor;
-  final Color labelColor;
-
-  const StyledButton({
-    required this.onPressed,
-    required this.label,
-    required this.icon,  // Add this line
-    required this.buttonColor,
-    required this.labelColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        primary: buttonColor,
-        elevation: 5,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: Colors.white),
-            SizedBox(width: 10),
-            Text(
-              label,
-              style: TextStyle(color: labelColor, fontSize: 18),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-

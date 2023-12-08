@@ -16,7 +16,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 void main() async {
   
   
- 
+    WidgetsFlutterBinding.ensureInitialized();
+
   const FirebaseOptions options = FirebaseOptions(
     apiKey: "AIzaSyBw4q31TrgZ3aitI6fP94_6xkeCRrrVj9A",
     authDomain: "vroom-vroom-app.firebaseapp.com",
@@ -47,7 +48,6 @@ void main() async {
   Workmanager().executeTask((task, inputData) {
 
 
-    WidgetsFlutterBinding.ensureInitialized();
     
     FlutterLocalNotificationsPlugin flip = new FlutterLocalNotificationsPlugin();
 
