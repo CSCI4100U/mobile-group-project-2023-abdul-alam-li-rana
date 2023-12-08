@@ -10,39 +10,14 @@ import 'login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'verification_screen.dart';
 import 'package:workmanager/workmanager.dart';
-import 'notifications.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-
-
+import 'dbops.dart';
 
 void main() async {
   
   
-  WidgetsFlutterBinding.ensureInitialized();
-  Workmanager().initialize(
-     
-      callbackDispatcher,
-     
-    
-      isInDebugMode: true
-  );
-  Workmanager().registerPeriodicTask(
-    "2",
-     
-    
-    "simplePeriodicTask",
-     
-    
-    frequency: Duration(minutes: 15),
-  );
-  Workmanager().registerPeriodicTask(
-    "2",
-    "simplePeriodicTask",
-    frequency: Duration(minutes: 15),
-  );
-
-
-    final FirebaseOptions options = FirebaseOptions(
+ 
+  const FirebaseOptions options = FirebaseOptions(
     apiKey: "AIzaSyBw4q31TrgZ3aitI6fP94_6xkeCRrrVj9A",
     authDomain: "vroom-vroom-app.firebaseapp.com",
     projectId: "vroom-vroom-app",
@@ -53,55 +28,55 @@ void main() async {
 
   await Firebase.initializeApp(options: options);
   FirebaseAuth auth = FirebaseAuth.instance;
-
+  
+  Workmanager().initialize(
+      callbackDispatcher,
+      isInDebugMode: false
+  );
+  Workmanager().registerPeriodicTask(
+    "2",
+    "simplePeriodicTask",
+    frequency: Duration(minutes: 15),
+  );
 
 
   runApp(MyApp());
 }
 
-void callbackDispatcher() {
+  void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) {
-     
-    // initialise the plugin of flutterlocalnotifications.
+
+
+    WidgetsFlutterBinding.ensureInitialized();
+    
     FlutterLocalNotificationsPlugin flip = new FlutterLocalNotificationsPlugin();
-     
-    // app_icon needs to be a added as a drawable
-    // resource to the Android head project.
+
     var android = new AndroidInitializationSettings('@mipmap/ic_launcher');
-    var IOS = new IOSInitializationSettings();
-     
-    // initialise settings for both Android and iOS device.
-    var settings = new InitializationSettings(android, IOS);
+    var settings = new InitializationSettings(android:android);
+
     flip.initialize(settings);
     _showNotificationWithDefaultSound(flip);
     return Future.value(true);
   });
 }
-
-
 Future _showNotificationWithDefaultSound(flip) async {
-   
-  // Show a notification after every 15 minute with the first
-  // appearance happening a minute after invoking the method
+  
   var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
-      'your channel id',
-      'your channel name',
-      'your channel description',
-      importance: Importance.Max,
-      priority: Priority.High
+      'Vroom',
+      'VroomVehicleManagement',
+      importance: Importance.max,
+      priority: Priority.high
   );
-  var iOSPlatformChannelSpecifics = new IOSNotificationDetails();
    
-  // initialise channel platform for both Android and iOS device.
   var platformChannelSpecifics = new NotificationDetails(
-      androidPlatformChannelSpecifics,
-      iOSPlatformChannelSpecifics
+      android:androidPlatformChannelSpecifics,
   );
-  await flip.show(0, 'GeeksforGeeks',
-    'Your are one step away to connect with GeeksforGeeks',
+  await flip.show(0, 'Vroom',
+    'Remember to update your Vehicle Milage!',
     platformChannelSpecifics, payload: 'Default_Sound'
   );
 }
+
 class MyApp extends StatelessWidget {
   const MyApp({Key? key});
 
@@ -119,7 +94,6 @@ class MyApp extends StatelessWidget {
           } else {
             // Check if the user signed out, and show the login form accordingly.
             return EmailVerificationScreen();
-            print("after sign out?");
           }
         } else {
           return LoginForm();
