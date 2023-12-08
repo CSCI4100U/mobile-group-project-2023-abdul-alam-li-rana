@@ -48,15 +48,17 @@ dependencies:
   flutter_map:
   latlong2:
   fancy_button_flutter: ^1.0.3+1
+  workmanager: ^0.5.2
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   http: ^1.1.0
-  flutter_local_notifications: ^13.0.0
+  flutter_local_notifications: ^16.2.0
   mapbox_polyline_points: ^0.0.6
   google_maps_flutter: ^2.0.10
   fan_side_drawer: ^1.0.2
-  shared_preferences: ^2.0.8
+
 
 dev_dependencies:
   flutter_test:
