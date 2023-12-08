@@ -35,7 +35,7 @@ class _TripPageState extends State<TripPage> {
 
   MapboxMapController? _controller;
   String? routeGeometry;
-  LatLng? _userLocation; 
+  LatLng? _userLocation; // Change to LatLng?
   bool isRoutePlotted = false;
   double? _totalDistance;
   double? _gasPrice;
@@ -48,7 +48,8 @@ class _TripPageState extends State<TripPage> {
   void initState() {
     super.initState();
     _getCurrentLocation();
-    _loadUserVehicles(); 
+    _loadUserVehicles(); // Load user's vehicles when the page is initialized
+  }
 
   Future<void> _loadUserVehicles() async {
     List<Vehicle> vehicles = await getVehicle();
