@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'vehicle.dart';
-import 'vehicle_dropdown.dart';
-import 'sidebar.dart';
-import 'dbops.dart';
+import 'package:final_project/Vehicles/vehicle.dart';
+import 'package:final_project/Vehicles/vehicle_dropdown.dart';
+import '../MainPages/sidebar.dart';
+import '../Functionality/dbops.dart';
 import 'help_page.dart';
-import 'api_utils.dart';
+import '../Functionality/api_utils.dart';
 
 class AiHelp extends StatefulWidget {
   @override

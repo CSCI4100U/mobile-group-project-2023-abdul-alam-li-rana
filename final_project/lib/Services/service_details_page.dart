@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'service.dart';
+import 'package:final_project/Services/service.dart';
 
 class ServiceDetails extends StatefulWidget {
   final Service service;

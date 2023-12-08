@@ -1,12 +1,12 @@
-import 'vehicle.dart';
+import 'package:final_project/Vehicles/vehicle.dart';
 import 'package:sqflite/sqflite.dart';
-import 'main.dart';
+import '../main.dart';
 import 'package:path/path.dart';
-import 'vehicle.dart';
+import 'package:final_project/Vehicles/vehicle.dart';
 import 'dart:math';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'service.dart';
+import '../Services/service.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

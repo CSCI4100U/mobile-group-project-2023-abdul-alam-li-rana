@@ -1,14 +1,13 @@
 import 'dart:typed_data';
-import 'vehicle_homepage.dart';
-
-import 'package:final_project/account.dart';
-import 'package:final_project/account_model.dart';
-import 'package:final_project/db_utils.dart';
+import 'package:final_project/Vehicles/vehicle_homepage.dart';
+import 'package:final_project/Functionality/account.dart';
+import 'package:final_project/Functionality/account_model.dart';
+import 'package:final_project/Functionality/db_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'trip_page.dart';
-import 'help_page.dart';
-import 'service_page.dart';
+import '../Trip/trip_page.dart';
+import '../AI/help_page.dart';
+import 'package:final_project/Services/service_page.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'login.dart';

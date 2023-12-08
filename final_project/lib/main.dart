@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
-import 'vehicle_homepage.dart';
-import 'trip_page.dart';
-import 'help_page.dart';
-import 'service_page.dart';
-import 'sidebar.dart';
+import 'package:final_project/Vehicles/vehicle_homepage.dart';
+import 'Trip/trip_page.dart';
+import 'AI/help_page.dart';
+import 'package:final_project/Services/service_page.dart';
+import 'MainPages/sidebar.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'home_page.dart';
-import 'login.dart';
+import 'MainPages/home_page.dart';
+import 'MainPages/login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+<<<<<<< HEAD
+import 'MainPages/verification_screen.dart';
+=======
 import 'verification_screen.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';

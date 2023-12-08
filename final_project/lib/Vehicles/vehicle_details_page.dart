@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'vehicle.dart';
-import 'dbops.dart';
+import 'package:final_project/Vehicles/vehicle.dart';
+import 'package:final_project/Functionality/dbops.dart';
 import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'expanded_image.dart';
-import 'service_list.dart';
+import 'package:final_project/Functionality/expanded_image.dart';
+import '../Services/service_list.dart';
 
 class VehicleDetails extends StatefulWidget {
   final Vehicle vehicle;

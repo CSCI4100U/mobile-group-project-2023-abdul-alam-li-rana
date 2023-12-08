@@ -1,51 +1,72 @@
 import 'dart:async';
-import 'package:final_project/add_service.dart';
-import 'package:final_project/dbops.dart';
-import 'package:final_project/edit_service.dart';
-
-import 'service.dart';
 import 'package:flutter/material.dart';
-import 'service_details_page.dart';
-import 'sidebar.dart';
+import 'package:final_project/MainPages/sidebar.dart';
+import 'vehicle.dart';
+import 'package:final_project/Functionality/dbops.dart';
+import 'package:final_project/Vehicles/add_vehicle.dart';
+import 'edit_vehicle.dart';
+import 'package:final_project/Vehicles/vehicle_details_page.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-class ServicePage extends StatefulWidget {
+class VehicleHomePage extends StatefulWidget {
   @override
-  _ServiceHomePageState createState() => _ServiceHomePageState();
+  _VehicleHomePageState createState() => _VehicleHomePageState();
 }
 
-class _ServiceHomePageState extends State<ServicePage> {
+class _VehicleHomePageState extends State<VehicleHomePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  late Service noSelection;
-  late Service selectedService;
-  late StreamController<List<dynamic>> _servicesStreamController;
-  late ServiceHoverController _hoverController;
+  late Vehicle noSelection;
+  late Vehicle selectedVehicle;
+  late StreamController<List<dynamic>> _vehiclesStreamController;
+  late VehicleHoverController _hoverController;
+  late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+  int id = 0;
 
   @override
   void initState() {
     super.initState();
-    noSelection = Service(
-      vehicle: '',
-      serviceName: '',
-      serviceDate: '',
-      serviceCost: '',
-      serviceMileage: '',
-      serviceDescription: '',
-      carId: '',
+    initializeNotifications();
+    noSelection = Vehicle(
+      id: '',
+      make: '',
+      model: '',
+      year: '',
+      vin: '',
+      color: '',
+      mileage: '',
+      fuelCapacity: '',
     );
-    selectedService = noSelection;
-    _servicesStreamController = StreamController<List<dynamic>>.broadcast();
-    _hoverController = ServiceHoverController();
-    fetchServices();
+    selectedVehicle = noSelection;
+    _vehiclesStreamController = StreamController<List<dynamic>>.broadcast();
+    _hoverController = VehicleHoverController();
+    fetchVehicles();
   }
 
-  Future<void> fetchServices() async {
-    final fetchedServices = await getService();
-    _servicesStreamController.add(fetchedServices);
+  void initializeNotifications() async {
+    // Initialize FlutterLocalNotificationsPlugin
+    flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('mipmap/ic_launcher');
+    final InitializationSettings initializationSettings =
+        InitializationSettings(
+      android: initializationSettingsAndroid,
+    );
+    await flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+    );
+  }
+
+
+
+  Future<void> fetchVehicles() async {
+    final fetchedVehicles = await getVehicle();
+    
+    _vehiclesStreamController.add(fetchedVehicles);
   }
 
   @override
   void dispose() {
-    _servicesStreamController.close();
+    _vehiclesStreamController.close();
     super.dispose();
   }
 
@@ -56,7 +77,7 @@ class _ServiceHomePageState extends State<ServicePage> {
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: Colors.grey[900],
-        title: Text('Service List', style: TextStyle(color: Colors.white)),
+        title: Text('Vehicle List', style: TextStyle(color: Colors.white)),
         leading: IconButton(
           icon: Icon(
             Icons.menu,
@@ -67,7 +88,7 @@ class _ServiceHomePageState extends State<ServicePage> {
           },
         ),
         actions: [
-          if (selectedService.carId != '')
+          if (selectedVehicle.id != '')
             Row(
               children: [
                 IconButton(
@@ -76,16 +97,16 @@ class _ServiceHomePageState extends State<ServicePage> {
                     color: Colors.white, // Set the color to white
                   ),
                   onPressed: () {
-                    _editService(selectedService);
+                    _editVehicle(selectedVehicle);
                   },
                 ),
                 IconButton(
                   icon: Icon(
-                    Icons.favorite,
+                    Icons.car_crash,
                     color: Colors.white, // Set the color to white
                   ),
                   onPressed: () {
-                    _expandService(selectedService);
+                    _expandVehicle(selectedVehicle);
                   },
                 ),
               ],
@@ -93,9 +114,15 @@ class _ServiceHomePageState extends State<ServicePage> {
         ],
       ),
       body: Container(
-        color: Colors.redAccent,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Colors.green, Colors.tealAccent],
+          ),
+        ),
         child: StreamBuilder<List<dynamic>>(
-          stream: _servicesStreamController.stream,
+          stream: _vehiclesStreamController.stream,
           initialData: [],
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -109,18 +136,18 @@ class _ServiceHomePageState extends State<ServicePage> {
                 child: Text('Error: ${snapshot.error}'),
               );
             }
-            final List<dynamic> services = snapshot.data ?? [];
-            return (services.isEmpty
+            final List<dynamic> vehicles = snapshot.data ?? [];
+            return (vehicles.isEmpty
                 ? Center(child: Text('No data'))
                 : ListView.builder(
-                    itemCount: services.length,
+                    itemCount: vehicles.length,
                     itemBuilder: (context, index) {
-                      final service = services[index];
+                      final vehicle = vehicles[index];
                       return Dismissible(
-                        key: Key(service.carId),
+                        key: Key(vehicle.id),
                         direction: DismissDirection.endToStart,
                         onDismissed: (direction) {
-                          _deleteService(service);
+                          _deleteVehicle(vehicle);
                         },
                         background: Container(
                           color: Colors.red,
@@ -131,12 +158,12 @@ class _ServiceHomePageState extends State<ServicePage> {
                             color: Colors.white,
                           ),
                         ),
-                        child: ServiceHoverRegion(
-                          service: service,
+                        child: VehicleHoverRegion(
+                          vehicle: vehicle,
                           hoverController: _hoverController,
                           onTap: () {
                             setState(() {
-                              selectedService = service;
+                              selectedVehicle = vehicle;
                             });
                           },
                           child: Card(
@@ -146,7 +173,7 @@ class _ServiceHomePageState extends State<ServicePage> {
                             child: Container(
                               decoration: BoxDecoration(
                                 border: Border.all(
-                                  color: selectedService.carId == service.carId
+                                  color: selectedVehicle.id == vehicle.id
                                       ? Colors.black
                                       : Colors.transparent,
                                   width: 2.0,
@@ -154,10 +181,10 @@ class _ServiceHomePageState extends State<ServicePage> {
                               ),
                               child: ListTile(
                                 title: Text(
-                                  '${service.serviceName} (${service.vehicle})',
+                                  '${vehicle.make} ${vehicle.model} (${vehicle.year})',
                                   style: TextStyle(
                                     fontSize: 22,
-                                    color: _hoverController.isHovered(service)
+                                    color: _hoverController.isHovered(vehicle)
                                         ? Colors.blue
                                         : Colors.black,
                                   ),
@@ -174,27 +201,27 @@ class _ServiceHomePageState extends State<ServicePage> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          _navigateToAddService();
+          _navigateToAddVehicle();
         },
         backgroundColor: Colors.grey[900], // Set your desired background color
         foregroundColor: Colors.white, // Set text/icon color
         icon: Icon(Icons.add),
-        label: Text('Add a Service'),
+        label: Text('Add Vehicle'),
       ),
       drawer: SideMenu(parentContext: context),
     );
   }
 
-  void _navigateToAddService() async {
-    final addedService = await Navigator.push(
+  void _navigateToAddVehicle() async {
+    final addedVehicle = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => AddService(),
+        builder: (context) => AddVehicle(),
       ),
     );
 
-    if (addedService != null) {
-      fetchServices();
+    if (addedVehicle != null) {
+      fetchVehicles();
     }
   }
 
@@ -212,7 +239,7 @@ class _ServiceHomePageState extends State<ServicePage> {
                 title: Text('Edit'),
                 onTap: () {
                   Navigator.pop(context);
-                  _editService(selectedService);
+                  _editVehicle(selectedVehicle);
                 },
               ),
               ListTile(
@@ -220,7 +247,7 @@ class _ServiceHomePageState extends State<ServicePage> {
                 title: Text('Delete'),
                 onTap: () {
                   Navigator.pop(context);
-                  _deleteService(selectedService);
+                  _deleteVehicle(selectedVehicle);
                 },
               ),
             ],
@@ -230,74 +257,74 @@ class _ServiceHomePageState extends State<ServicePage> {
     );
   }
 
-  void _editService(Service service) async {
-    final updatedService = await Navigator.push(
+  void _editVehicle(Vehicle vehicle) async {
+    final updatedVehicle = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => EditService(serviceToEdit: service),
+        builder: (context) => EditVehicle(vehicleToEdit: vehicle),
       ),
     );
 
-    if (updatedService != null) {
-      fetchServices();
+    if (updatedVehicle != null) {
+      fetchVehicles();
       setState(() {
-        selectedService = noSelection;
+        selectedVehicle = noSelection;
       });
     }
   }
 
-  void _expandService(Service service) async {
-    final updatedService = await Navigator.push(
+  void _expandVehicle(Vehicle vehicle) async {
+    final updatedVehicle = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ServiceDetails(service: service),
+        builder: (context) => VehicleDetails(vehicle: vehicle),
       ),
     );
   }
 
-  void _deleteService(Service service) async {
-    await deleteService(service.id);
-    await fetchServices();
+  void _deleteVehicle(Vehicle vehicle) async {
+    await deleteVehicle(vehicle.id);
+    await fetchVehicles();
     setState(() {
-      selectedService = noSelection;
+      selectedVehicle = noSelection;
     });
   }
 }
 
-class ServiceHoverController {
-  final Set<Service> _hoveredServices = {};
+class VehicleHoverController {
+  final Set<Vehicle> _hoveredVehicles = {};
 
-  void hover(Service service) {
-    _hoveredServices.add(service);
+  void hover(Vehicle vehicle) {
+    _hoveredVehicles.add(vehicle);
   }
 
-  void unhover(Service service) {
-    _hoveredServices.remove(service);
+  void unhover(Vehicle vehicle) {
+    _hoveredVehicles.remove(vehicle);
   }
 
-  bool isHovered(Service service) {
-    return _hoveredServices.contains(service);
+  bool isHovered(Vehicle vehicle) {
+    return _hoveredVehicles.contains(vehicle);
   }
 }
 
-class ServiceHoverRegion extends StatefulWidget {
-  final Service service;
-  final ServiceHoverController hoverController;
+class VehicleHoverRegion extends StatefulWidget {
+  final Vehicle vehicle;
+  final VehicleHoverController hoverController;
   final VoidCallback onTap;
   final Widget child;
 
-  ServiceHoverRegion({
-    required this.service,
+  VehicleHoverRegion({
+    required this.vehicle,
     required this.hoverController,
     required this.onTap,
     required this.child,
   });
 
   @override
-  _ServiceHoverRegionState createState() => _ServiceHoverRegionState();
+  _VehicleHoverRegionState createState() => _VehicleHoverRegionState();
 }
 
-class _ServiceHoverRegionState extends State<ServiceHoverRegion> {
+class _VehicleHoverRegionState extends State<VehicleHoverRegion> {
   bool isTapped = false;
 
   @override
@@ -316,17 +343,17 @@ class _ServiceHoverRegionState extends State<ServiceHoverRegion> {
       },
       child: MouseRegion(
         onEnter: (_) {
-          widget.hoverController.hover(widget.service);
+          widget.hoverController.hover(widget.vehicle);
         },
         onExit: (_) {
-          widget.hoverController.unhover(widget.service);
+          widget.hoverController.unhover(widget.vehicle);
         },
         child: Container(
           decoration: BoxDecoration(
             border: Border.all(
               color: isTapped
                   ? Colors.blue
-                  : widget.hoverController.isHovered(widget.service)
+                  : widget.hoverController.isHovered(widget.vehicle)
                       ? Colors.blue
                       : Colors.transparent,
               width: 2.0,

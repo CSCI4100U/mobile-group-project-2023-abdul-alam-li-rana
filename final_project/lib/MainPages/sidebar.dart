@@ -2,10 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'home_page.dart';  // Import the necessary files
-import 'vehicle_homepage.dart';
-import 'trip_page.dart';
-import 'service_page.dart';
-import 'help_page.dart';
+import 'package:final_project/Vehicles/vehicle_homepage.dart';
+import '../Trip/trip_page.dart';
+import 'package:final_project/Services/service_page.dart';
+import '../AI/help_page.dart';
 
 class SideMenu extends StatelessWidget {
   final BuildContext parentContext;

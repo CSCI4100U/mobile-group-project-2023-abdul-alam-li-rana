@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'vehicle.dart';
+import 'package:final_project/Vehicles/vehicle.dart';
 
 class TripDetailsWidget extends StatelessWidget {
   final double? totalDistance;
